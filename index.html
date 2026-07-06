@@ -97,7 +97,7 @@
             color: #4a5568;
             padding: 8px;
             border-radius: 5px;
-            margin-top: auto; /* Empuja la caja al final de la columna */
+            margin-top: auto;
             font-weight: bold;
         }
         .ramo {
@@ -141,7 +141,6 @@
             cursor: pointer;
         }
         
-        /* Caja de notas */
         .input-nota {
             display: none;
             width: 50px;
@@ -166,7 +165,7 @@
         
         .ramo.aprobado { background-color: #d3f9d8; border-color: #40c057; color: #2b8a3e; text-decoration: line-through; }
         .ramo.aprobado .clave { color: #2b8a3e; }
-        .ramo.aprobado span { text-decoration: none; } /* Previene que la nota y créditos se tachen */
+        .ramo.aprobado span { text-decoration: none; }
         .ramo.aprobado .select-optativa { text-decoration: none; opacity: 0.8; pointer-events: none; }
 
         /* --- HOVER --- */
@@ -196,8 +195,7 @@
     </div>
 
     <div class="malla-container" id="malla">
-        <!-- Los semestres se generan aquí -->
-    </div>
+        </div>
 
     <script>
         const listaOptativas = [
@@ -213,21 +211,18 @@
         ];
 
         const ramos = [
-            // Semestre 1
             { id: "FIN100-12", nombre: "Desarrollo Integral y Comunicación", semestre: 1, cr: 3, req: [] },
             { id: "FIS1035", nombre: "Introducción a la Física", semestre: 1, cr: 5, req: [] },
             { id: "ICN110", nombre: "Intro. a la Ingeniería Civil en Transporte", semestre: 1, cr: 5, req: [] },
             { id: "MAT1001", nombre: "Fundamentos de Matemáticas", semestre: 1, cr: 6, req: [] },
             { id: "ANTROP", nombre: "Antropología Cristiana", semestre: 1, cr: 2, req: [] },
             
-            // Semestre 2
             { id: "FIS1002", nombre: "Física para Ingeniería", semestre: 2, cr: 5, req: ["MAT1001", "FIS1035"] },
             { id: "ICN120", nombre: "Dibujo de Ingeniería 1", semestre: 2, cr: 3, req: ["ICN110"] },
             { id: "ICN123", nombre: "Fundamentos de Química", semestre: 2, cr: 3, req: ["ICN110"] },
             { id: "MAT1002", nombre: "Cálculo Diferencial e Integral", semestre: 2, cr: 6, req: ["MAT1001"] },
             { id: "MAT1004", nombre: "Álgebra Lineal", semestre: 2, cr: 4, req: ["MAT1001"] },
 
-            // Semestre 3
             { id: "FIS1037", nombre: "Física General Termo. y Ondas", semestre: 3, cr: 3, req: ["MAT1002"] },
             { id: "ICN213", nombre: "Ciencia de los Materiales", semestre: 3, cr: 4, req: ["ICN123"] },
             { id: "ICN214", nombre: "BIM", semestre: 3, cr: 3, req: ["ICN120"] },
@@ -235,7 +230,6 @@
             { id: "ING9001", nombre: "Inglés 1", semestre: 3, cr: 2, req: [] },
             { id: "MAT1003", nombre: "Cálculo en Varias Variables", semestre: 3, cr: 4, req: ["MAT1002"] },
 
-            // Semestre 4
             { id: "FIS1038", nombre: "Física General Electromagnetismo", semestre: 4, cr: 3, req: ["FIS1037"] },
             { id: "ICN221", nombre: "Mecánica de Sólidos", semestre: 4, cr: 4, req: ["ICN213"] },
             { id: "ICN222", nombre: "Estadística y Probabilidades", semestre: 4, cr: 3, req: ["MAT1003"] },
@@ -243,7 +237,6 @@
             { id: "ING9002", nombre: "Inglés 2", semestre: 4, cr: 2, req: ["ING9001"] },
             { id: "FF1", nombre: "Formación Fundamental 1", semestre: 4, cr: 2, req: [] },
 
-            // Semestre 5
             { id: "ICN311", nombre: "Programación y Métodos Numéricos", semestre: 5, cr: 3, req: ["MAT1005"] },
             { id: "ICN314", nombre: "Diseño, Innovación y Emprend.", semestre: 5, cr: 3, req: ["ICN213"] },
             { id: "ICN316", nombre: "Análisis de Sistemas de Transporte", semestre: 5, cr: 4, req: ["ICN222"] },
@@ -251,7 +244,6 @@
             { id: "ING9003", nombre: "Inglés 3", semestre: 5, cr: 2, req: ["ING9002"] },
             { id: "FF2", nombre: "Formación Fundamental 2", semestre: 5, cr: 2, req: [] },
 
-            // Semestre 6
             { id: "ICN326", nombre: "Taller de Innov. en Medios de Transporte", semestre: 6, cr: 4, req: ["ICN314"] },
             { id: "ICN327", nombre: "Logística del Abastecimiento", semestre: 6, cr: 4, req: ["ICN317"] },
             { id: "ICN328", nombre: "Economía de Transporte", semestre: 6, cr: 3, req: ["ICN316"] },
@@ -259,7 +251,6 @@
             { id: "ING9004", nombre: "Inglés 4", semestre: 6, cr: 2, req: ["ING9003"] },
             { id: "FF3", nombre: "Formación Fundamental 3", semestre: 6, cr: 2, req: [] },
 
-            // Semestre 7
             { id: "ICN313", nombre: "Geotecnia 1", semestre: 7, cr: 4, req: ["ICN221"] },
             { id: "ICN411", nombre: "Ingeniería Económica", semestre: 7, cr: 3, req: ["ICN222"] },
             { id: "ICN415", nombre: "Sistema Integrado de Gestión", semestre: 7, cr: 3, req: ["ICN314"] },
@@ -267,7 +258,6 @@
             { id: "ICN418", nombre: "Demanda de Transporte", semestre: 7, cr: 4, req: ["ICN328"] },
             { id: "ICN419", nombre: "Teoría de Flujos de Transporte", semestre: 7, cr: 4, req: ["ICN316", "ICN222"] },
 
-            // Semestre 8
             { id: "ICN420", nombre: "Transporte y Logística Sustentable", semestre: 8, cr: 3, req: ["ICN417", "ICN419"] },
             { id: "ICN422", nombre: "Obras Lineales", semestre: 8, cr: 4, req: ["ICN313"] },
             { id: "ICN427", nombre: "Logística de Distribución", semestre: 8, cr: 3, req: ["ICN417", "ICN328"] },
@@ -276,7 +266,6 @@
             { id: "ICN431", nombre: "Ingeniería de Tránsito", semestre: 8, cr: 3, req: ["ICN419"] },
             { id: "ETICA", nombre: "Ética Cristiana", semestre: 8, cr: 2, req: [] },
 
-            // Semestre 9
             { id: "ICN510", nombre: "Transporte Marítimo y Log. Portuaria", semestre: 9, cr: 3, req: ["ICN422", "ICN427"] },
             { id: "ICN511", nombre: "Finanzas", semestre: 9, cr: 3, req: ["ICN411"] },
             { id: "ICN512", nombre: "Project Management 1", semestre: 9, cr: 3, req: ["ICN422"] },
@@ -284,7 +273,6 @@
             { id: "ICN518", nombre: "Diseño y Planificación de Proyectos", semestre: 9, cr: 4, req: ["ICN415"] },
             { id: "ICN519", nombre: "Transporte Aéreo de Pasajeros y Carga", semestre: 9, cr: 3, req: ["ICN422", "ICN427"] },
 
-            // Semestre 10
             { id: "ICN520", nombre: "Ciencia de Datos para Transporte", semestre: 10, cr: 4, req: ["ICN518", "ICN418"] },
             { id: "ICN525", nombre: "Project Management 2", semestre: 10, cr: 3, req: ["ICN512"] },
             { id: "ICN526", nombre: "Herr. de Simulación en Transp. Urbano", semestre: 10, cr: 3, req: ["ICN428", "ICN431"] },
@@ -292,7 +280,6 @@
             { id: "ICN528", nombre: "Taller de Eval. de Proyectos", semestre: 10, cr: 4, req: ["ICN518", "ICN511"] },
             { id: "ICN529", nombre: "GIS. Movilidad y Territorio", semestre: 10, cr: 4, req: ["ICN518", "ICN420"] },
 
-            // Semestre 11
             { id: "ICN610", nombre: "Proyecto de Título en Transporte", semestre: 11, cr: 8, req: ["ICN528"] },
             { id: "ELEC1", nombre: "Optativa 1", semestre: 11, isOptativa: true, req: ["120CR"] },
             { id: "ELEC2", nombre: "Optativa 2", semestre: 11, isOptativa: true, req: ["120CR"] },
@@ -321,7 +308,6 @@
                 
                 container.appendChild(col);
                 
-                // Footer para el promedio del semestre
                 const footer = document.createElement('div');
                 footer.className = 'semestre-promedio';
                 footer.innerHTML = `PPS: <span id="promedio-sem-${i}">-</span>`;
@@ -355,7 +341,6 @@
                     div.innerHTML = `<span class="clave">${ramo.id}</span><span>${ramo.nombre}</span>${notaInput}<span class="creditos">${ramo.cr} CR</span>`;
                 }
                 
-                // Insertar justo arriba del footer del semestre
                 col.insertBefore(div, col.lastChild);
                 
                 div.addEventListener('click', () => toggleRamo(ramo.id));
@@ -371,7 +356,7 @@
             if (!isNaN(val) && val >= 1.0 && val <= 7.0) {
                 notas[id] = val;
             } else {
-                notas[id] = 4.0; // Valor por defecto si ponen algo inválido
+                notas[id] = 4.0;
                 event.target.value = 4.0;
             }
             localStorage.setItem('malla-transporte-notas', JSON.stringify(notas));
@@ -395,7 +380,6 @@
             let sumaCreditosGeneral = 0;
             totalCreditos = 0;
 
-            // Primero calculamos qué ramos están aprobados y los créditos totales (necesario para prerrequisitos de optativas)
             aprobados.forEach(id => {
                 let r = ramos.find(x => x.id === id);
                 if (r) {
@@ -409,7 +393,6 @@
             });
             document.getElementById('contador-creditos').innerText = totalCreditos;
 
-            // Actualizar visualmente cada ramo y calcular promedios
             for (let i = 1; i <= numSemestres; i++) {
                 let sumaSemestre = 0;
                 let creditosSemestre = 0;
@@ -418,7 +401,6 @@
                     const el = document.getElementById(ramo.id);
                     el.classList.remove('aprobado', 'disponible', 'bloqueado');
 
-                    // Actualizar créditos en pantalla para optativas
                     if (ramo.isOptativa) {
                         let crSpan = document.getElementById(`cr-${ramo.id}`);
                         if (eleccionesOptativas[ramo.id]) {
@@ -432,13 +414,11 @@
                     if (aprobados.includes(ramo.id)) {
                         el.classList.add('aprobado');
                         
-                        // Cargar nota en el input
                         let inputEl = document.getElementById(`nota-${ramo.id}`);
                         if (inputEl) {
                             let notaActual = notas[ramo.id] || 4.0;
                             inputEl.value = notaActual;
                             
-                            // Sumar al cálculo de promedio
                             let crRamo = ramo.cr;
                             if (ramo.isOptativa && eleccionesOptativas[ramo.id]) {
                                 let opt = listaOptativas.find(x => x.id === eleccionesOptativas[ramo.id]);
@@ -461,16 +441,16 @@
                     }
                 });
 
-                // Imprimir PPS (Promedio Ponderado Semestral)
-                let promSemestre = creditosSemestre > 0 ? (sumaSemestre / creditosSemestre).toFixed(2) : "-";
+                // Aquí está el cambio: toFixed(1) para que solo salga 1 decimal
+                let promSemestre = creditosSemestre > 0 ? (sumaSemestre / creditosSemestre).toFixed(1) : "-";
                 document.getElementById(`promedio-sem-${i}`).innerText = promSemestre;
                 
                 sumaNotasPorCredito += sumaSemestre;
                 sumaCreditosGeneral += creditosSemestre;
             }
 
-            // Imprimir PPA (Promedio Ponderado Acumulado)
-            let ppa = sumaCreditosGeneral > 0 ? (sumaNotasPorCredito / sumaCreditosGeneral).toFixed(2) : "-";
+            // Aquí está el cambio: toFixed(1) para el PPA
+            let ppa = sumaCreditosGeneral > 0 ? (sumaNotasPorCredito / sumaCreditosGeneral).toFixed(1) : "-";
             document.getElementById('ppa-general').innerText = ppa;
         }
 
@@ -484,11 +464,11 @@
 
             if (aprobados.includes(id)) {
                 aprobados = aprobados.filter(ramoId => ramoId !== id);
-                delete notas[id]; // Borrar la nota si se desmarca
+                delete notas[id]; 
             } else {
                 if (document.getElementById(id).classList.contains('bloqueado')) return;
                 aprobados.push(id);
-                notas[id] = 4.0; // Nota por defecto al aprobar
+                notas[id] = 4.0; 
             }
             
             localStorage.setItem('malla-transporte-aprobados', JSON.stringify(aprobados));
