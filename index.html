@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Malla Interactiva - Ingeniería Civil en Transporte PUCV</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f6;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+        }
+        h1 {
+            text-align: center;
+            color: #1a365d;
+        }
+        .malla-container {
+            display: flex;
+            overflow-x: auto;
+            gap: 15px;
+            padding-bottom: 20px;
+        }
+        .semestre {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            min-width: 200px;
+        }
+        .semestre-titulo {
+            text-align: center;
+            font-weight: bold;
+            background-color: #2b6cb0;
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .ramo {
+            background-color: white;
+            border: 2px solid #cbd5e0;
+            border-radius: 8px;
+            padding: 15px 10px;
+            text-align: center;
+            font-size: 0.85em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            min-height: 80px;
+        }
+        .ramo .clave {
+            font-weight: bold;
+            color: #2b6cb0;
+            margin-bottom: 5px;
+            font-size: 0.9em;
+        }
+        /* Estados de interacción */
+        .ramo:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .ramo.selected {
+            background-color: #ebf8ff;
+            border-color: #3182ce;
+        }
+        .ramo.prerrequisito {
+            background-color: #fff5f5;
+            border-color: #e53e3e; /* Rojo */
+        }
+        .ramo.abre {
+            background-color: #f0fff4;
+            border-color: #38a169; /* Verde */
+        }
+        /* Color especial para ramos de formación y electivos */
+        .ramo.formacion {
+            border-color: #d69e2e;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Malla Interactiva - Ingeniería Civil en Transporte</h1>
+    <div class="malla-container" id="malla">
+        </div>
+
+    <script>
+        const ramos = [
+            // Semestre 1
+            { id: "FIN100-12", nombre: "Desarrollo Integral y Comunicación", semestre: 1, req: [] },
+            { id: "FIS1035", nombre: "Introducción a la Física", semestre: 1, req: [] },
+            { id: "ICN110", nombre: "Intro. a la Ingeniería Civil en Transporte", semestre: 1, req: [] },
+            { id: "MAT1001", nombre: "Fundamentos de Matemáticas", semestre: 1, req: [] },
+            { id: "ANTROP", nombre: "Antropología Cristiana", semestre: 1, req: [], claseExtra: "formacion" },
+            
+            // Semestre 2
+            { id: "FIS1002", nombre: "Física para Ingeniería", semestre: 2, req: ["MAT1001", "FIS1035"] },
+            { id: "ICN120", nombre: "Dibujo de Ingeniería 1", semestre: 2, req: ["ICN110"] },
+            { id: "ICN123", nombre: "Fundamentos de Química", semestre: 2, req: ["ICN110"] },
+            { id: "MAT1002", nombre: "Cálculo Diferencial e Integral", semestre: 2, req: ["MAT1001"] },
+            { id: "MAT1004", nombre: "Álgebra Lineal", semestre: 2, req: ["MAT1001"] },
+
+            // Semestre 3
+            { id: "FIS1037", nombre: "Física General Termo. y Ondas", semestre: 3, req: ["MAT1002"] },
+            { id: "ICN213", nombre: "Ciencia de los Materiales", semestre: 3, req: ["ICN123"] },
+            { id: "ICN214", nombre: "BIM", semestre: 3, req: ["ICN120"] },
+            { id: "ICN215", nombre: "Geomensura", semestre: 3, req: ["ICN120"] },
+            { id: "ING9001", nombre: "Inglés 1", semestre: 3, req: [] },
+            { id: "MAT1003", nombre: "Cálculo en Varias Variables", semestre: 3, req: ["MAT1002"] },
+
+            // Semestre 4
+            { id: "FIS1038", nombre: "Física General Electromagnetismo", semestre: 4, req: ["FIS1037"] },
+            { id: "ICN221", nombre: "Mecánica de Sólidos", semestre: 4, req: ["ICN213"] },
+            { id: "ICN222", nombre: "Estadística y Probabilidades", semestre: 4, req: ["MAT1003"] },
+            { id: "MAT1005", nombre: "Ecuaciones Diferenciales", semestre: 4, req: ["MAT1002"] },
+            { id: "ING9002", nombre: "Inglés 2", semestre: 4, req: ["ING9001"] },
+            { id: "FF1", nombre: "Formación Fundamental 1", semestre: 4, req: [], claseExtra: "formacion" },
+
+            // Semestre 5
+            { id: "ICN311", nombre: "Programación y Métodos Numéricos", semestre: 5, req: ["MAT1005"] },
+            { id: "ICN314", nombre: "Diseño, Innovación y Emprend.", semestre: 5, req: ["ICN213"] },
+            { id: "ICN316", nombre: "Análisis de Sistemas de Transporte", semestre: 5, req: ["ICN222"] },
+            { id: "ICN317", nombre: "Ingeniería Logística", semestre: 5, req: ["ICN222"] },
+            { id: "ING9003", nombre: "Inglés 3", semestre: 5, req: ["ING9002"] },
+            { id: "FF2", nombre: "Formación Fundamental 2", semestre: 5, req: [], claseExtra: "formacion" },
+
+            // Semestre 6
+            { id: "ICN326", nombre: "Taller de Innov. en Medios de Transporte", semestre: 6, req: ["ICN314"] },
+            { id: "ICN327", nombre: "Logística del Abastecimiento", semestre: 6, req: ["ICN317"] },
+            { id: "ICN328", nombre: "Economía de Transporte", semestre: 6, req: ["ICN316"] },
+            { id: "ICN421", nombre: "Investigación de Operaciones", semestre: 6, req: ["ICN311"] },
+            { id: "ING9004", nombre: "Inglés 4", semestre: 6, req: ["ING9003"] },
+            { id: "FF3", nombre: "Formación Fundamental 3", semestre: 6, req: [], claseExtra: "formacion" },
+
+            // Semestre 7
+            { id: "ICN313", nombre: "Geotecnia 1", semestre: 7, req: ["ICN221"] },
+            { id: "ICN411", nombre: "Ingeniería Económica", semestre: 7, req: ["ICN222"] },
+            { id: "ICN415", nombre: "Sistema Integrado de Gestión", semestre: 7, req: ["ICN314"] },
+            { id: "ICN417", nombre: "Logística del Almacenamiento", semestre: 7, req: ["ICN327"] },
+            { id: "ICN418", nombre: "Demanda de Transporte", semestre: 7, req: ["ICN328"] },
+            { id: "ICN419", nombre: "Teoría de Flujos de Transporte", semestre: 7, req: ["ICN316", "ICN222"] },
+
+            // Semestre 8
+            { id: "ICN420", nombre: "Transporte y Logística Sustentable", semestre: 8, req: ["ICN417", "ICN419"] },
+            { id: "ICN422", nombre: "Obras Lineales", semestre: 8, req: ["ICN313"] },
+            { id: "ICN427", nombre: "Logística de Distribución", semestre: 8, req: ["ICN417", "ICN328"] },
+            { id: "ICN428", nombre: "Simulación y Modelos Aplicados", semestre: 8, req: ["ICN417", "ICN328"] },
+            { id: "ICN429", nombre: "Taller de Transporte y Logística", semestre: 8, req: ["ICN326", "ICN418"] },
+            { id: "ICN431", nombre: "Ingeniería de Tránsito", semestre: 8, req: ["ICN419"] },
+            { id: "ETICA", nombre: "Ética Cristiana", semestre: 8, req: [], claseExtra: "formacion" },
+
+            // Semestre 9
+            { id: "ICN510", nombre: "Transporte Marítimo y Log. Portuaria", semestre: 9, req: ["ICN422", "ICN427"] },
+            { id: "ICN511", nombre: "Finanzas", semestre: 9, req: ["ICN411"] },
+            { id: "ICN512", nombre: "Project Management 1", semestre: 9, req: ["ICN422"] },
+            { id: "ICN517", nombre: "Transporte Carretero y Ferroviario", semestre: 9, req: ["ICN422", "ICN431"] },
+            { id: "ICN518", nombre: "Diseño y Planificación de Proyectos", semestre: 9, req: ["ICN415"] },
+            { id: "ICN519", nombre: "Transporte Aéreo de Pasajeros y Carga", semestre: 9, req: ["ICN422", "ICN427"] },
+            { id: "ELEC1", nombre: "Asignatura Electiva 1", semestre: 9, req: [], claseExtra: "formacion" },
+            { id: "ELEC2", nombre: "Asignatura Electiva 2", semestre: 9, req: [], claseExtra: "formacion" },
+            { id: "ELEC3", nombre: "Asignatura Electiva 3", semestre: 9, req: [], claseExtra: "formacion" },
+
+            // Semestre 10
+            { id: "ICN520", nombre: "Ciencia de Datos para Transporte", semestre: 10, req: ["ICN518", "ICN418"] },
+            { id: "ICN525", nombre: "Project Management 2", semestre: 10, req: ["ICN512"] },
+            { id: "ICN526", nombre: "Herr. de Simulación en Transp. Urbano", semestre: 10, req: ["ICN428", "ICN431"] },
+            { id: "ICN527", nombre: "Gestión de la Cadena de Suministro", semestre: 10, req: ["ICN517", "ICN519", "ICN510"] },
+            { id: "ICN528", nombre: "Taller de Eval. de Proyectos", semestre: 10, req: ["ICN518", "ICN511"] },
+            { id: "ICN529", nombre: "GIS. Movilidad y Territorio", semestre: 10, req: ["ICN518", "ICN420"] },
+
+            // Semestre 11
+            { id: "ICN610", nombre: "Proyecto de Título en Transporte", semestre: 11, req: ["ICN528"] }
+        ];
+
+        const container = document.getElementById('malla');
+        const numSemestres = 11;
+
+        // Crear columnas para cada semestre
+        for (let i = 1; i <= numSemestres; i++) {
+            const col = document.createElement('div');
+            col.className = 'semestre';
+            col.id = `semestre-${i}`;
+            
+            const titulo = document.createElement('div');
+            titulo.className = 'semestre-titulo';
+            titulo.innerText = `Semestre ${i}`;
+            col.appendChild(titulo);
+            
+            container.appendChild(col);
+        }
+
+        // Renderizar cada ramo en su semestre correspondiente
+        ramos.forEach(ramo => {
+            const col = document.getElementById(`semestre-${ramo.semestre}`);
+            const div = document.createElement('div');
+            div.className = `ramo ${ramo.claseExtra || ''}`;
+            div.id = ramo.id;
+            div.innerHTML = `<span class="clave">${ramo.id}</span><span>${ramo.nombre}</span>`;
+            
+            div.addEventListener('mouseenter', () => resaltarRamo(ramo.id));
+            div.addEventListener('mouseleave', limpiarResaltado);
+            
+            col.appendChild(div);
+        });
+
+        function resaltarRamo(idSeleccionado) {
+            limpiarResaltado();
+            const ramoActual = ramos.find(r => r.id === idSeleccionado);
+            if (!ramoActual) return;
+
+            document.getElementById(idSeleccionado).classList.add('selected');
+
+            ramoActual.req.forEach(reqId => {
+                const el = document.getElementById(reqId);
+                if (el) el.classList.add('prerrequisito');
+            });
+
+            ramos.forEach(r => {
+                if (r.req.includes(idSeleccionado)) {
+                    const el = document.getElementById(r.id);
+                    if (el) el.classList.add('abre');
+                }
+            });
+        }
+
+        function limpiarResaltado() {
+            document.querySelectorAll('.ramo').forEach(el => {
+                el.classList.remove('selected', 'prerrequisito', 'abre');
+            });
+        }
+    </script>
+</body>
+</html>
