@@ -17,6 +17,23 @@
             color: #1a365d;
             margin-bottom: 5px;
         }
+        .progreso-container {
+            text-align: center;
+            font-weight: bold;
+            font-size: 1.2em;
+            color: #2b6cb0;
+            margin-bottom: 15px;
+            background-color: #ebf8ff;
+            padding: 10px;
+            border-radius: 8px;
+            display: inline-block;
+            border: 1px solid #90cdf4;
+        }
+        .header-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
         .controles {
             display: flex;
             justify-content: center;
@@ -63,7 +80,7 @@
             display: flex;
             flex-direction: column;
             gap: 10px;
-            min-width: 190px;
+            min-width: 200px;
         }
         .semestre-titulo {
             text-align: center;
@@ -76,7 +93,7 @@
         .ramo {
             border: 2px solid #cbd5e0;
             border-radius: 8px;
-            padding: 15px 10px 22px 10px; /* Padding extra abajo para los créditos */
+            padding: 15px 10px 22px 10px;
             text-align: center;
             font-size: 0.85em;
             cursor: pointer;
@@ -85,9 +102,10 @@
             display: flex;
             flex-direction: column;
             justify-content: center;
+            align-items: center;
             min-height: 80px;
             user-select: none;
-            position: relative; /* Necesario para posicionar los créditos */
+            position: relative;
         }
         .ramo .clave {
             font-weight: bold;
@@ -102,60 +120,44 @@
             font-weight: bold;
             opacity: 0.7;
         }
-
-        /* --- ESTADOS DE LA MALLA (Estilo USM) --- */
-        /* 1. Bloqueado (Gris) */
-        .ramo.bloqueado {
-            background-color: #f1f3f5;
-            border-color: #dee2e6;
-            color: #868e96;
+        .select-optativa {
+            max-width: 95%;
+            margin-top: 5px;
+            font-size: 0.9em;
+            padding: 4px;
+            border-radius: 4px;
+            border: 1px solid #cbd5e0;
+            background-color: rgba(255, 255, 255, 0.8);
+            cursor: pointer;
         }
+
+        /* --- ESTADOS --- */
+        .ramo.bloqueado { background-color: #f1f3f5; border-color: #dee2e6; color: #868e96; }
         .ramo.bloqueado .clave { color: #868e96; }
-
-        /* 2. Disponible (Amarillo) */
-        .ramo.disponible {
-            background-color: #fff9db;
-            border-color: #fcc419;
-            color: #333;
-        }
+        
+        .ramo.disponible { background-color: #fff9db; border-color: #fcc419; color: #333; }
         .ramo.disponible .clave { color: #b08d00; }
-
-        /* 3. Aprobado (Verde) */
-        .ramo.aprobado {
-            background-color: #d3f9d8;
-            border-color: #40c057;
-            color: #2b8a3e;
-            text-decoration: line-through;
-        }
+        
+        .ramo.aprobado { background-color: #d3f9d8; border-color: #40c057; color: #2b8a3e; text-decoration: line-through; }
         .ramo.aprobado .clave { color: #2b8a3e; }
-        .ramo.aprobado .creditos { text-decoration: none; } /* Que los créditos no se tachen */
+        .ramo.aprobado .creditos { text-decoration: none; }
+        .ramo.aprobado .select-optativa { text-decoration: none; opacity: 0.8; pointer-events: none; }
 
-        /* --- ESTADOS HOVER (Mouse encima) --- */
-        .ramo:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
-        }
-        .ramo.selected {
-            border-width: 3px;
-            transform: scale(1.02);
-        }
-        .ramo.prerrequisito-hover {
-            background-color: #ffe3e3 !important;
-            border-color: #fa5252 !important;
-            color: #c92a2a !important;
-            text-decoration: none !important;
-        }
-        .ramo.abre-hover {
-            background-color: #e7f5ff !important;
-            border-color: #339af0 !important;
-            color: #1864ab !important;
-            text-decoration: none !important;
-        }
+        /* --- HOVER --- */
+        .ramo:hover { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.15); }
+        .ramo.selected { border-width: 3px; transform: scale(1.02); }
+        .ramo.prerrequisito-hover { background-color: #ffe3e3 !important; border-color: #fa5252 !important; color: #c92a2a !important; text-decoration: none !important; }
+        .ramo.abre-hover { background-color: #e7f5ff !important; border-color: #339af0 !important; color: #1864ab !important; text-decoration: none !important; }
     </style>
 </head>
 <body>
 
-    <h1>Malla Interactiva - Ingeniería Civil en Transporte</h1>
+    <div class="header-section">
+        <h1>Malla Interactiva - Ingeniería Civil en Transporte</h1>
+        <div class="progreso-container">
+            Créditos Aprobados: <span id="contador-creditos">0</span>
+        </div>
+    </div>
     
     <div class="controles">
         <div class="leyenda">
@@ -167,10 +169,22 @@
     </div>
 
     <div class="malla-container" id="malla">
-        <!-- Los semestres se generarán aquí -->
+        <!-- Los semestres se generan aquí -->
     </div>
 
     <script>
+        const listaOptativas = [
+            { id: "ICC444", nombre: "Innovación Ind. Construcción", cr: 3 },
+            { id: "ICC483", nombre: "Intro. Restauración Constructiva", cr: 2 },
+            { id: "ICN630", nombre: "Intro. a BIM y Mod. Revit", cr: 3 },
+            { id: "ICN631", nombre: "Logística de Última Milla (4cr)", cr: 4 },
+            { id: "ICN632", nombre: "SIG Aplicado a la Ingeniería", cr: 4 },
+            { id: "ICN635", nombre: "Proyecto de Movilidad Urbana", cr: 3 },
+            { id: "ICN636", nombre: "Potencial de IA en Infraestructuras", cr: 4 },
+            { id: "ICN645", nombre: "Habilidades Directivas y Liderazgo", cr: 3 },
+            { id: "ICN650", nombre: "Logística de Última Milla (2cr)", cr: 2 }
+        ];
+
         const ramos = [
             // Semestre 1
             { id: "FIN100-12", nombre: "Desarrollo Integral y Comunicación", semestre: 1, cr: 3, req: [] },
@@ -251,23 +265,22 @@
             { id: "ICN528", nombre: "Taller de Eval. de Proyectos", semestre: 10, cr: 4, req: ["ICN518", "ICN511"] },
             { id: "ICN529", nombre: "GIS. Movilidad y Territorio", semestre: 10, cr: 4, req: ["ICN518", "ICN420"] },
 
-            // Semestre 11 (Electivas movidas aquí)
+            // Semestre 11
             { id: "ICN610", nombre: "Proyecto de Título en Transporte", semestre: 11, cr: 8, req: ["ICN528"] },
-            { id: "ELEC1", nombre: "Asignatura Electiva 1", semestre: 11, cr: 4, req: [] },
-            { id: "ELEC2", nombre: "Asignatura Electiva 2", semestre: 11, cr: 4, req: [] },
-            { id: "ELEC3", nombre: "Asignatura Electiva 3", semestre: 11, cr: 4, req: [] }
+            { id: "ELEC1", nombre: "Optativa 1", semestre: 11, isOptativa: true, req: ["120CR"] },
+            { id: "ELEC2", nombre: "Optativa 2", semestre: 11, isOptativa: true, req: ["120CR"] },
+            { id: "ELEC3", nombre: "Optativa 3", semestre: 11, isOptativa: true, req: ["120CR"] }
         ];
 
-        // Cargar estado de ramos aprobados desde el navegador, o iniciar vacío
         let aprobados = JSON.parse(localStorage.getItem('malla-transporte-aprobados')) || [];
+        let eleccionesOptativas = JSON.parse(localStorage.getItem('malla-transporte-optativas')) || {};
+        let totalCreditos = 0;
         const numSemestres = 11;
 
-        // Función para inicializar la malla
         function generarMalla() {
             const container = document.getElementById('malla');
-            container.innerHTML = ''; // Limpiar
+            container.innerHTML = ''; 
 
-            // Crear columnas
             for (let i = 1; i <= numSemestres; i++) {
                 const col = document.createElement('div');
                 col.className = 'semestre';
@@ -281,16 +294,30 @@
                 container.appendChild(col);
             }
 
-            // Crear ramos
             ramos.forEach(ramo => {
                 const col = document.getElementById(`semestre-${ramo.semestre}`);
                 const div = document.createElement('div');
                 div.className = 'ramo';
                 div.id = ramo.id;
-                // Añadimos el span de los créditos
-                div.innerHTML = `<span class="clave">${ramo.id}</span><span>${ramo.nombre}</span><span class="creditos">${ramo.cr} CR</span>`;
                 
-                // Eventos de click y hover
+                if (ramo.isOptativa) {
+                    let opcionesHTML = `<option value="">Elegir asignatura...</option>`;
+                    listaOptativas.forEach(opt => {
+                        let isSelected = eleccionesOptativas[ramo.id] === opt.id ? "selected" : "";
+                        opcionesHTML += `<option value="${opt.id}" ${isSelected}>${opt.id} - ${opt.nombre}</option>`;
+                    });
+
+                    div.innerHTML = `
+                        <span class="clave">${ramo.id}</span>
+                        <select class="select-optativa" onchange="seleccionarOptativa(event, '${ramo.id}')" onclick="event.stopPropagation()">
+                            ${opcionesHTML}
+                        </select>
+                        <span class="creditos" id="cr-${ramo.id}">- CR</span>
+                    `;
+                } else {
+                    div.innerHTML = `<span class="clave">${ramo.id}</span><span>${ramo.nombre}</span><span class="creditos">${ramo.cr} CR</span>`;
+                }
+                
                 div.addEventListener('click', () => toggleRamo(ramo.id));
                 div.addEventListener('mouseenter', () => hacerHover(ramo.id));
                 div.addEventListener('mouseleave', limpiarHover);
@@ -301,18 +328,59 @@
             actualizarEstados();
         }
 
-        // Función central que calcula qué está bloqueado, disponible o aprobado
+        function calcularCreditos() {
+            totalCreditos = 0;
+            aprobados.forEach(id => {
+                let r = ramos.find(x => x.id === id);
+                if (r) {
+                    if (r.isOptativa && eleccionesOptativas[id]) {
+                        let opt = listaOptativas.find(x => x.id === eleccionesOptativas[id]);
+                        if (opt) totalCreditos += opt.cr;
+                    } else if (!r.isOptativa) {
+                        totalCreditos += r.cr;
+                    }
+                }
+            });
+            document.getElementById('contador-creditos').innerText = totalCreditos;
+        }
+
+        function seleccionarOptativa(event, slotId) {
+            const val = event.target.value;
+            if(val) {
+                eleccionesOptativas[slotId] = val;
+            } else {
+                delete eleccionesOptativas[slotId];
+                if (aprobados.includes(slotId)) toggleRamo(slotId); // Desmarcar si se borra la selección
+            }
+            localStorage.setItem('malla-transporte-optativas', JSON.stringify(eleccionesOptativas));
+            actualizarEstados();
+        }
+
         function actualizarEstados() {
+            calcularCreditos();
+
             ramos.forEach(ramo => {
                 const el = document.getElementById(ramo.id);
-                // Limpiar clases base
                 el.classList.remove('aprobado', 'disponible', 'bloqueado');
+
+                // Actualizar los créditos en pantalla para las optativas
+                if (ramo.isOptativa) {
+                    let crSpan = document.getElementById(`cr-${ramo.id}`);
+                    if (eleccionesOptativas[ramo.id]) {
+                        let opt = listaOptativas.find(x => x.id === eleccionesOptativas[ramo.id]);
+                        if (opt) crSpan.innerText = `${opt.cr} CR`;
+                    } else {
+                        crSpan.innerText = `- CR`;
+                    }
+                }
 
                 if (aprobados.includes(ramo.id)) {
                     el.classList.add('aprobado');
                 } else {
-                    // Verificar si se cumplen los prerrequisitos
-                    const cumpleRequisitos = ramo.req.every(req => aprobados.includes(req));
+                    const cumpleRequisitos = ramo.req.every(req => {
+                        if (req === "120CR") return totalCreditos >= 120;
+                        return aprobados.includes(req);
+                    });
                     
                     if (cumpleRequisitos) {
                         el.classList.add('disponible');
@@ -323,21 +391,27 @@
             });
         }
 
-        // Marcar o desmarcar un ramo al hacer click
         function toggleRamo(id) {
+            const ramo = ramos.find(r => r.id === id);
+            
+            // Validar que se haya elegido una optativa antes de aprobarla
+            if (ramo.isOptativa && !eleccionesOptativas[id]) {
+                alert("Primero debes elegir una asignatura del menú desplegable.");
+                return;
+            }
+
             if (aprobados.includes(id)) {
-                // Si ya está aprobado, lo quitamos
                 aprobados = aprobados.filter(ramoId => ramoId !== id);
             } else {
-                // Si no está aprobado, lo agregamos
+                // Prevenir que se apruebe si está bloqueado
+                if (document.getElementById(id).classList.contains('bloqueado')) return;
                 aprobados.push(id);
             }
-            // Guardar en el navegador
+            
             localStorage.setItem('malla-transporte-aprobados', JSON.stringify(aprobados));
             actualizarEstados();
         }
 
-        // Efectos al pasar el mouse (Hover)
         function hacerHover(idSeleccionado) {
             limpiarHover();
             const ramoActual = ramos.find(r => r.id === idSeleccionado);
@@ -345,13 +419,13 @@
 
             document.getElementById(idSeleccionado).classList.add('selected');
 
-            // Pintar requisitos en rojo
             ramoActual.req.forEach(reqId => {
-                const el = document.getElementById(reqId);
-                if (el) el.classList.add('prerrequisito-hover');
+                if (reqId !== "120CR") {
+                    const el = document.getElementById(reqId);
+                    if (el) el.classList.add('prerrequisito-hover');
+                }
             });
 
-            // Pintar ramos que abre en azul
             ramos.forEach(r => {
                 if (r.req.includes(idSeleccionado)) {
                     const el = document.getElementById(r.id);
@@ -366,16 +440,16 @@
             });
         }
 
-        // Función del botón reiniciar
         function resetearMalla() {
             if(confirm("¿Estás seguro de que quieres reiniciar tu malla? Esto borrará tus ramos aprobados.")){
                 aprobados = [];
+                eleccionesOptativas = {};
                 localStorage.removeItem('malla-transporte-aprobados');
-                actualizarEstados();
+                localStorage.removeItem('malla-transporte-optativas');
+                generarMalla(); // Regerar para resetear los <select>
             }
         }
 
-        // Arrancar la malla al cargar la página
         generarMalla();
 
     </script>
