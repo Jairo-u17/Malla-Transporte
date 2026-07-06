@@ -20,11 +20,11 @@
         .progreso-container {
             text-align: center;
             font-weight: bold;
-            font-size: 1.2em;
+            font-size: 1.1em;
             color: #2b6cb0;
             margin-bottom: 15px;
             background-color: #ebf8ff;
-            padding: 10px;
+            padding: 10px 20px;
             border-radius: 8px;
             display: inline-block;
             border: 1px solid #90cdf4;
@@ -90,6 +90,16 @@
             padding: 10px;
             border-radius: 5px;
         }
+        .semestre-promedio {
+            text-align: center;
+            font-size: 0.85em;
+            background-color: #e2e8f0;
+            color: #4a5568;
+            padding: 8px;
+            border-radius: 5px;
+            margin-top: auto; /* Empuja la caja al final de la columna */
+            font-weight: bold;
+        }
         .ramo {
             border: 2px solid #cbd5e0;
             border-radius: 8px;
@@ -103,7 +113,7 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            min-height: 80px;
+            min-height: 90px;
             user-select: none;
             position: relative;
         }
@@ -130,6 +140,22 @@
             background-color: rgba(255, 255, 255, 0.8);
             cursor: pointer;
         }
+        
+        /* Caja de notas */
+        .input-nota {
+            display: none;
+            width: 50px;
+            text-align: center;
+            margin-top: 8px;
+            padding: 2px;
+            border: 1px solid #a0aec0;
+            border-radius: 4px;
+            font-size: 0.95em;
+            font-weight: bold;
+        }
+        .ramo.aprobado .input-nota {
+            display: inline-block;
+        }
 
         /* --- ESTADOS --- */
         .ramo.bloqueado { background-color: #f1f3f5; border-color: #dee2e6; color: #868e96; }
@@ -140,7 +166,7 @@
         
         .ramo.aprobado { background-color: #d3f9d8; border-color: #40c057; color: #2b8a3e; text-decoration: line-through; }
         .ramo.aprobado .clave { color: #2b8a3e; }
-        .ramo.aprobado .creditos { text-decoration: none; }
+        .ramo.aprobado span { text-decoration: none; } /* Previene que la nota y créditos se tachen */
         .ramo.aprobado .select-optativa { text-decoration: none; opacity: 0.8; pointer-events: none; }
 
         /* --- HOVER --- */
@@ -155,7 +181,8 @@
     <div class="header-section">
         <h1>Malla Interactiva - Ingeniería Civil en Transporte</h1>
         <div class="progreso-container">
-            Créditos Aprobados: <span id="contador-creditos">0</span>
+            Créditos Aprobados: <span id="contador-creditos">0</span> &nbsp;|&nbsp; 
+            PPA General: <span id="ppa-general">-</span>
         </div>
     </div>
     
@@ -274,6 +301,7 @@
 
         let aprobados = JSON.parse(localStorage.getItem('malla-transporte-aprobados')) || [];
         let eleccionesOptativas = JSON.parse(localStorage.getItem('malla-transporte-optativas')) || {};
+        let notas = JSON.parse(localStorage.getItem('malla-transporte-notas')) || {};
         let totalCreditos = 0;
         const numSemestres = 11;
 
@@ -292,6 +320,12 @@
                 col.appendChild(titulo);
                 
                 container.appendChild(col);
+                
+                // Footer para el promedio del semestre
+                const footer = document.createElement('div');
+                footer.className = 'semestre-promedio';
+                footer.innerHTML = `PPS: <span id="promedio-sem-${i}">-</span>`;
+                col.appendChild(footer);
             }
 
             ramos.forEach(ramo => {
@@ -300,6 +334,8 @@
                 div.className = 'ramo';
                 div.id = ramo.id;
                 
+                const notaInput = `<input type="number" class="input-nota" id="nota-${ramo.id}" step="0.1" min="1.0" max="7.0" placeholder="4.0" onchange="actualizarNota(event, '${ramo.id}')" onclick="event.stopPropagation()">`;
+
                 if (ramo.isOptativa) {
                     let opcionesHTML = `<option value="">Elegir asignatura...</option>`;
                     listaOptativas.forEach(opt => {
@@ -312,24 +348,54 @@
                         <select class="select-optativa" onchange="seleccionarOptativa(event, '${ramo.id}')" onclick="event.stopPropagation()">
                             ${opcionesHTML}
                         </select>
+                        ${notaInput}
                         <span class="creditos" id="cr-${ramo.id}">- CR</span>
                     `;
                 } else {
-                    div.innerHTML = `<span class="clave">${ramo.id}</span><span>${ramo.nombre}</span><span class="creditos">${ramo.cr} CR</span>`;
+                    div.innerHTML = `<span class="clave">${ramo.id}</span><span>${ramo.nombre}</span>${notaInput}<span class="creditos">${ramo.cr} CR</span>`;
                 }
+                
+                // Insertar justo arriba del footer del semestre
+                col.insertBefore(div, col.lastChild);
                 
                 div.addEventListener('click', () => toggleRamo(ramo.id));
                 div.addEventListener('mouseenter', () => hacerHover(ramo.id));
                 div.addEventListener('mouseleave', limpiarHover);
-                
-                col.appendChild(div);
             });
 
             actualizarEstados();
         }
 
-        function calcularCreditos() {
+        function actualizarNota(event, id) {
+            let val = parseFloat(event.target.value);
+            if (!isNaN(val) && val >= 1.0 && val <= 7.0) {
+                notas[id] = val;
+            } else {
+                notas[id] = 4.0; // Valor por defecto si ponen algo inválido
+                event.target.value = 4.0;
+            }
+            localStorage.setItem('malla-transporte-notas', JSON.stringify(notas));
+            actualizarEstados();
+        }
+
+        function seleccionarOptativa(event, slotId) {
+            const val = event.target.value;
+            if(val) {
+                eleccionesOptativas[slotId] = val;
+            } else {
+                delete eleccionesOptativas[slotId];
+                if (aprobados.includes(slotId)) toggleRamo(slotId); 
+            }
+            localStorage.setItem('malla-transporte-optativas', JSON.stringify(eleccionesOptativas));
+            actualizarEstados();
+        }
+
+        function actualizarEstados() {
+            let sumaNotasPorCredito = 0;
+            let sumaCreditosGeneral = 0;
             totalCreditos = 0;
+
+            // Primero calculamos qué ramos están aprobados y los créditos totales (necesario para prerrequisitos de optativas)
             aprobados.forEach(id => {
                 let r = ramos.find(x => x.id === id);
                 if (r) {
@@ -342,59 +408,75 @@
                 }
             });
             document.getElementById('contador-creditos').innerText = totalCreditos;
-        }
 
-        function seleccionarOptativa(event, slotId) {
-            const val = event.target.value;
-            if(val) {
-                eleccionesOptativas[slotId] = val;
-            } else {
-                delete eleccionesOptativas[slotId];
-                if (aprobados.includes(slotId)) toggleRamo(slotId); // Desmarcar si se borra la selección
+            // Actualizar visualmente cada ramo y calcular promedios
+            for (let i = 1; i <= numSemestres; i++) {
+                let sumaSemestre = 0;
+                let creditosSemestre = 0;
+
+                ramos.filter(r => r.semestre === i).forEach(ramo => {
+                    const el = document.getElementById(ramo.id);
+                    el.classList.remove('aprobado', 'disponible', 'bloqueado');
+
+                    // Actualizar créditos en pantalla para optativas
+                    if (ramo.isOptativa) {
+                        let crSpan = document.getElementById(`cr-${ramo.id}`);
+                        if (eleccionesOptativas[ramo.id]) {
+                            let opt = listaOptativas.find(x => x.id === eleccionesOptativas[ramo.id]);
+                            if (opt) crSpan.innerText = `${opt.cr} CR`;
+                        } else {
+                            crSpan.innerText = `- CR`;
+                        }
+                    }
+
+                    if (aprobados.includes(ramo.id)) {
+                        el.classList.add('aprobado');
+                        
+                        // Cargar nota en el input
+                        let inputEl = document.getElementById(`nota-${ramo.id}`);
+                        if (inputEl) {
+                            let notaActual = notas[ramo.id] || 4.0;
+                            inputEl.value = notaActual;
+                            
+                            // Sumar al cálculo de promedio
+                            let crRamo = ramo.cr;
+                            if (ramo.isOptativa && eleccionesOptativas[ramo.id]) {
+                                let opt = listaOptativas.find(x => x.id === eleccionesOptativas[ramo.id]);
+                                if (opt) crRamo = opt.cr;
+                            }
+                            sumaSemestre += (notaActual * crRamo);
+                            creditosSemestre += crRamo;
+                        }
+                    } else {
+                        const cumpleRequisitos = ramo.req.every(req => {
+                            if (req === "120CR") return totalCreditos >= 120;
+                            return aprobados.includes(req);
+                        });
+                        
+                        if (cumpleRequisitos) {
+                            el.classList.add('disponible');
+                        } else {
+                            el.classList.add('bloqueado');
+                        }
+                    }
+                });
+
+                // Imprimir PPS (Promedio Ponderado Semestral)
+                let promSemestre = creditosSemestre > 0 ? (sumaSemestre / creditosSemestre).toFixed(2) : "-";
+                document.getElementById(`promedio-sem-${i}`).innerText = promSemestre;
+                
+                sumaNotasPorCredito += sumaSemestre;
+                sumaCreditosGeneral += creditosSemestre;
             }
-            localStorage.setItem('malla-transporte-optativas', JSON.stringify(eleccionesOptativas));
-            actualizarEstados();
-        }
 
-        function actualizarEstados() {
-            calcularCreditos();
-
-            ramos.forEach(ramo => {
-                const el = document.getElementById(ramo.id);
-                el.classList.remove('aprobado', 'disponible', 'bloqueado');
-
-                // Actualizar los créditos en pantalla para las optativas
-                if (ramo.isOptativa) {
-                    let crSpan = document.getElementById(`cr-${ramo.id}`);
-                    if (eleccionesOptativas[ramo.id]) {
-                        let opt = listaOptativas.find(x => x.id === eleccionesOptativas[ramo.id]);
-                        if (opt) crSpan.innerText = `${opt.cr} CR`;
-                    } else {
-                        crSpan.innerText = `- CR`;
-                    }
-                }
-
-                if (aprobados.includes(ramo.id)) {
-                    el.classList.add('aprobado');
-                } else {
-                    const cumpleRequisitos = ramo.req.every(req => {
-                        if (req === "120CR") return totalCreditos >= 120;
-                        return aprobados.includes(req);
-                    });
-                    
-                    if (cumpleRequisitos) {
-                        el.classList.add('disponible');
-                    } else {
-                        el.classList.add('bloqueado');
-                    }
-                }
-            });
+            // Imprimir PPA (Promedio Ponderado Acumulado)
+            let ppa = sumaCreditosGeneral > 0 ? (sumaNotasPorCredito / sumaCreditosGeneral).toFixed(2) : "-";
+            document.getElementById('ppa-general').innerText = ppa;
         }
 
         function toggleRamo(id) {
             const ramo = ramos.find(r => r.id === id);
             
-            // Validar que se haya elegido una optativa antes de aprobarla
             if (ramo.isOptativa && !eleccionesOptativas[id]) {
                 alert("Primero debes elegir una asignatura del menú desplegable.");
                 return;
@@ -402,13 +484,15 @@
 
             if (aprobados.includes(id)) {
                 aprobados = aprobados.filter(ramoId => ramoId !== id);
+                delete notas[id]; // Borrar la nota si se desmarca
             } else {
-                // Prevenir que se apruebe si está bloqueado
                 if (document.getElementById(id).classList.contains('bloqueado')) return;
                 aprobados.push(id);
+                notas[id] = 4.0; // Nota por defecto al aprobar
             }
             
             localStorage.setItem('malla-transporte-aprobados', JSON.stringify(aprobados));
+            localStorage.setItem('malla-transporte-notas', JSON.stringify(notas));
             actualizarEstados();
         }
 
@@ -441,12 +525,14 @@
         }
 
         function resetearMalla() {
-            if(confirm("¿Estás seguro de que quieres reiniciar tu malla? Esto borrará tus ramos aprobados.")){
+            if(confirm("¿Estás seguro de que quieres reiniciar tu malla? Esto borrará tus ramos y notas.")){
                 aprobados = [];
                 eleccionesOptativas = {};
+                notas = {};
                 localStorage.removeItem('malla-transporte-aprobados');
                 localStorage.removeItem('malla-transporte-optativas');
-                generarMalla(); // Regerar para resetear los <select>
+                localStorage.removeItem('malla-transporte-notas');
+                generarMalla(); 
             }
         }
 
