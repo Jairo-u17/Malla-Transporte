@@ -12,10 +12,37 @@
             margin: 0;
             padding: 20px;
         }
+        .header-section {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+        }
+        /* Estilos para el logo */
+        .logo-ceit {
+            position: absolute;
+            top: 0;
+            right: 20px;
+            height: 90px;
+            width: auto;
+            border-radius: 8px;
+        }
+        /* Ajuste del logo para celulares */
+        @media (max-width: 850px) {
+            .logo-ceit {
+                position: static;
+                margin-top: 10px;
+                margin-bottom: 10px;
+                height: 70px;
+            }
+        }
         h1 {
             text-align: center;
             color: #1a365d;
             margin-bottom: 5px;
+            padding-top: 10px;
+            max-width: 70%;
         }
         .progreso-container {
             text-align: center;
@@ -28,11 +55,6 @@
             border-radius: 8px;
             display: inline-block;
             border: 1px solid #90cdf4;
-        }
-        .header-section {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
         }
         .controles {
             display: flex;
@@ -178,6 +200,8 @@
 <body>
 
     <div class="header-section">
+        <img src="logo.png" alt="Logo CEIT PUCV" class="logo-ceit">
+        
         <h1>Malla Interactiva - Ingeniería Civil en Transporte</h1>
         <div class="progreso-container">
             Créditos Aprobados: <span id="contador-creditos">0</span> &nbsp;|&nbsp; 
@@ -441,7 +465,6 @@
                     }
                 });
 
-                // Aquí está el cambio: toFixed(1) para que solo salga 1 decimal
                 let promSemestre = creditosSemestre > 0 ? (sumaSemestre / creditosSemestre).toFixed(1) : "-";
                 document.getElementById(`promedio-sem-${i}`).innerText = promSemestre;
                 
@@ -449,7 +472,6 @@
                 sumaCreditosGeneral += creditosSemestre;
             }
 
-            // Aquí está el cambio: toFixed(1) para el PPA
             let ppa = sumaCreditosGeneral > 0 ? (sumaNotasPorCredito / sumaCreditosGeneral).toFixed(1) : "-";
             document.getElementById('ppa-general').innerText = ppa;
         }
