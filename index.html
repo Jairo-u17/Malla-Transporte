@@ -19,7 +19,6 @@
             align-items: center;
             width: 100%;
         }
-        /* Estilos para el logo */
         .logo-ceit {
             position: absolute;
             top: 0;
@@ -28,7 +27,6 @@
             width: auto;
             border-radius: 8px;
         }
-        /* Ajuste del logo para celulares */
         @media (max-width: 850px) {
             .logo-ceit {
                 position: static;
@@ -103,6 +101,13 @@
             flex-direction: column;
             gap: 10px;
             min-width: 200px;
+            border-radius: 8px;
+            transition: background-color 0.2s;
+            padding: 5px; /* Para que al arrastrar sobre él se vea un margen interno */
+        }
+        .semestre.drag-over {
+            background-color: #e2e8f0;
+            border: 2px dashed #a0aec0;
         }
         .semestre-titulo {
             text-align: center;
@@ -139,6 +144,18 @@
             user-select: none;
             position: relative;
         }
+        /* Estilos para arrastrar */
+        .ramo.movible {
+            cursor: grab;
+        }
+        .ramo.movible:active {
+            cursor: grabbing;
+        }
+        .ramo.dragging {
+            opacity: 0.4;
+            transform: scale(0.95);
+        }
+
         .ramo .clave {
             font-weight: bold;
             margin-bottom: 5px;
@@ -162,25 +179,6 @@
             background-color: rgba(255, 255, 255, 0.8);
             cursor: pointer;
         }
-        
-        /* Select para mover ramos */
-        .select-mover {
-            max-width: 90%;
-            margin-top: 5px;
-            font-size: 0.8em;
-            padding: 3px;
-            border-radius: 4px;
-            border: 1px dashed #a0aec0;
-            background-color: #f7fafc;
-            color: #4a5568;
-            cursor: pointer;
-        }
-        .ramo.aprobado .select-mover {
-            text-decoration: none;
-            opacity: 0.8;
-            pointer-events: none;
-        }
-        
         .input-nota {
             display: none;
             width: 50px;
@@ -209,7 +207,7 @@
         .ramo.aprobado .select-optativa { text-decoration: none; opacity: 0.8; pointer-events: none; }
 
         /* --- HOVER --- */
-        .ramo:hover { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.15); }
+        .ramo:hover:not(.dragging) { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.15); }
         .ramo.selected { border-width: 3px; transform: scale(1.02); }
         .ramo.prerrequisito-hover { background-color: #ffe3e3 !important; border-color: #fa5252 !important; color: #c92a2a !important; text-decoration: none !important; }
         .ramo.abre-hover { background-color: #e7f5ff !important; border-color: #339af0 !important; color: #1864ab !important; text-decoration: none !important; }
@@ -218,7 +216,7 @@
 <body>
 
     <div class="header-section">
-        <img src="Picsart_26-04-05_22-27-20-453.png" alt="Logo CEIT PUCV" class="logo-ceit">
+        <img src="logo.jpg" alt="Logo CEIT PUCV" class="logo-ceit">
         
         <h1>Malla Interactiva - Ingeniería Civil en Transporte</h1>
         <div class="progreso-container">
@@ -356,6 +354,24 @@
                 titulo.innerText = `Semestre ${i}`;
                 col.appendChild(titulo);
                 
+                // --- Eventos Drag and Drop para la Columna ---
+                col.addEventListener('dragover', (e) => {
+                    e.preventDefault(); // Permite soltar elementos aquí
+                    col.classList.add('drag-over');
+                });
+                col.addEventListener('dragleave', () => {
+                    col.classList.remove('drag-over');
+                });
+                col.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    col.classList.remove('drag-over');
+                    const ramoId = e.dataTransfer.getData('text/plain');
+                    if (ramoId) {
+                        const nuevoSemestre = i;
+                        moverRamoDrop(ramoId, nuevoSemestre);
+                    }
+                });
+
                 container.appendChild(col);
                 
                 const footer = document.createElement('div');
@@ -366,28 +382,25 @@
 
             ramos.forEach(ramo => {
                 const col = document.getElementById(`semestre-${ramo.semestre}`);
-                // En caso de que haya un error con el número de semestre, evita que se rompa
                 if (!col) return;
 
                 const div = document.createElement('div');
-                div.className = 'ramo';
+                div.className = 'ramo' + (ramo.movible ? ' movible' : '');
                 div.id = ramo.id;
                 
-                const notaInput = `<input type="number" class="input-nota" id="nota-${ramo.id}" step="0.1" min="1.0" max="7.0" placeholder="4.0" onchange="actualizarNota(event, '${ramo.id}')" onclick="event.stopPropagation()">`;
-
-                let moverHTML = '';
+                // --- Eventos Drag and Drop para el Ramo ---
                 if (ramo.movible) {
-                    let opcionesMover = '';
-                    for(let s = 1; s <= 11; s++) {
-                        let sel = (s === ramo.semestre) ? 'selected' : '';
-                        opcionesMover += `<option value="${s}" ${sel}>Semestre ${s}</option>`;
-                    }
-                    moverHTML = `
-                        <select class="select-mover" onchange="moverRamo(event, '${ramo.id}')" onclick="event.stopPropagation()">
-                            ${opcionesMover}
-                        </select>
-                    `;
+                    div.setAttribute('draggable', 'true');
+                    div.addEventListener('dragstart', (e) => {
+                        e.dataTransfer.setData('text/plain', ramo.id);
+                        setTimeout(() => div.classList.add('dragging'), 0);
+                    });
+                    div.addEventListener('dragend', () => {
+                        div.classList.remove('dragging');
+                    });
                 }
+
+                const notaInput = `<input type="number" class="input-nota" id="nota-${ramo.id}" step="0.1" min="1.0" max="7.0" placeholder="4.0" onchange="actualizarNota(event, '${ramo.id}')" onclick="event.stopPropagation()">`;
 
                 if (ramo.isOptativa) {
                     let opcionesHTML = `<option value="">Elegir asignatura...</option>`;
@@ -401,7 +414,6 @@
                         <select class="select-optativa" onchange="seleccionarOptativa(event, '${ramo.id}')" onclick="event.stopPropagation()">
                             ${opcionesHTML}
                         </select>
-                        ${moverHTML}
                         ${notaInput}
                         <span class="creditos" id="cr-${ramo.id}">- CR</span>
                     `;
@@ -409,7 +421,6 @@
                     div.innerHTML = `
                         <span class="clave">${ramo.id}</span>
                         <span>${ramo.nombre}</span>
-                        ${moverHTML}
                         ${notaInput}
                         <span class="creditos">${ramo.cr} CR</span>
                     `;
@@ -425,12 +436,15 @@
             actualizarEstados();
         }
 
-        function moverRamo(event, id) {
-            let nuevoSemestre = parseInt(event.target.value);
-            semestresModificados[id] = nuevoSemestre;
-            localStorage.setItem('malla-transporte-semestres', JSON.stringify(semestresModificados));
-            // Al regenerar, los ramos se dibujarán automáticamente en su nueva columna
-            generarMalla();
+        // Función que se dispara al soltar el ramo en una nueva columna
+        function moverRamoDrop(id, nuevoSemestre) {
+            const ramo = ramos.find(r => r.id === id);
+            // Validar que el ramo soltado realmente sea movible
+            if (ramo && ramo.movible) {
+                semestresModificados[id] = nuevoSemestre;
+                localStorage.setItem('malla-transporte-semestres', JSON.stringify(semestresModificados));
+                generarMalla(); // Refrescar la vista
+            }
         }
 
         function actualizarNota(event, id) {
@@ -481,7 +495,6 @@
 
                 ramos.filter(r => r.semestre === i).forEach(ramo => {
                     const el = document.getElementById(ramo.id);
-                    // Si el elemento no existe (ej: problemas de carga), lo salta
                     if(!el) return;
                     
                     el.classList.remove('aprobado', 'disponible', 'bloqueado');
