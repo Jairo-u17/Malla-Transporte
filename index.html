@@ -5,237 +5,225 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Malla Interactiva - Ingeniería Civil en Transporte PUCV</title>
     <style>
+        /* Definición de Variables de Color para Modo Claro y Oscuro */
+        :root {
+            --bg-color: #f8f9fa;
+            --text-color: #333;
+            --box-bg: #ffffff;
+            --header-color: #1a365d;
+            --progreso-bg: #ebf8ff;
+            --progreso-border: #90cdf4;
+            --semestre-titulo-bg: #2b6cb0;
+            --semestre-promedio-bg: #e2e8f0;
+            --semestre-promedio-text: #4a5568;
+            --border-color: #cbd5e0;
+            
+            /* Estados de los ramos */
+            --bloq-bg: #f1f3f5; --bloq-border: #dee2e6; --bloq-text: #868e96;
+            --disp-bg: #fff9db; --disp-border: #fcc419; --disp-text: #333; --disp-clave: #b08d00;
+            --aprob-bg: #d3f9d8; --aprob-border: #40c057; --aprob-text: #2b8a3e;
+            
+            /* Hover States */
+            --req-bg: #ffe3e3; --req-border: #fa5252; --req-text: #c92a2a;
+            --abre-bg: #e7f5ff; --abre-border: #339af0; --abre-text: #1864ab;
+        }
+
+        .dark-mode {
+            --bg-color: #1a202c;
+            --text-color: #e2e8f0;
+            --box-bg: #2d3748;
+            --header-color: #90cdf4;
+            --progreso-bg: #2a4365;
+            --progreso-border: #2b6cb0;
+            --semestre-titulo-bg: #2b6cb0;
+            --semestre-promedio-bg: #4a5568;
+            --semestre-promedio-text: #e2e8f0;
+            --border-color: #4a5568;
+
+            --bloq-bg: #2d3748; --bloq-border: #4a5568; --bloq-text: #a0aec0;
+            --disp-bg: #744210; --disp-border: #d69e2e; --disp-text: #fbd38d; --disp-clave: #f6ad55;
+            --aprob-bg: #22543d; --aprob-border: #48bb78; --aprob-text: #9ae6b4;
+            
+            --req-bg: #742a2a; --req-border: #fc8181; --req-text: #feb2b2;
+            --abre-bg: #2a4365; --abre-border: #63b3ed; --abre-text: #90cdf4;
+        }
+
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f8f9fa;
-            color: #333;
+            background-color: var(--bg-color);
+            color: var(--text-color);
             margin: 0;
             padding: 20px;
+            transition: background-color 0.3s, color 0.3s;
         }
-        .header-section {
-            position: relative;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            width: 100%;
-        }
-        .logo-ceit {
-            position: absolute;
-            top: 0;
-            right: 20px;
-            height: 90px;
-            width: auto;
-            border-radius: 8px;
-        }
-        @media (max-width: 850px) {
-            .logo-ceit {
-                position: static;
-                margin-top: 10px;
-                margin-bottom: 10px;
-                height: 70px;
-            }
-        }
-        h1 {
-            text-align: center;
-            color: #1a365d;
-            margin-bottom: 5px;
-            padding-top: 10px;
-            max-width: 70%;
-        }
+        
+        /* Estilos de controles y cabecera */
+        .header-section { position: relative; display: flex; flex-direction: column; align-items: center; width: 100%; }
+        .logo-ceit { position: absolute; top: 0; right: 20px; height: 90px; border-radius: 8px; }
+        h1 { text-align: center; color: var(--header-color); margin-bottom: 5px; max-width: 70%; }
+        
         .progreso-container {
-            text-align: center;
-            font-weight: bold;
-            font-size: 1.1em;
-            color: #2b6cb0;
-            margin-bottom: 15px;
-            background-color: #ebf8ff;
-            padding: 10px 20px;
-            border-radius: 8px;
-            display: inline-block;
-            border: 1px solid #90cdf4;
+            text-align: center; font-weight: bold; font-size: 1.1em; color: var(--progreso-border);
+            margin-bottom: 15px; background-color: var(--progreso-bg); padding: 10px 20px;
+            border-radius: 8px; border: 1px solid var(--progreso-border);
         }
-        .controles {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 20px;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
+        
+        .controles-superiores { display: flex; justify-content: center; gap: 15px; margin-bottom: 15px; flex-wrap: wrap; }
+        .buscador {
+            padding: 8px 15px; border-radius: 20px; border: 1px solid var(--border-color);
+            width: 250px; background-color: var(--box-bg); color: var(--text-color);
         }
-        .leyenda {
-            display: flex;
-            gap: 15px;
-            font-size: 0.9em;
-        }
-        .item-leyenda {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-        .caja-color {
-            width: 15px;
-            height: 15px;
-            border-radius: 3px;
-            border: 1px solid #ccc;
-        }
+        
+        .leyenda { display: flex; gap: 15px; font-size: 0.9em; margin-bottom: 15px; justify-content: center; }
+        .item-leyenda { display: flex; align-items: center; gap: 5px; }
+        .caja-color { width: 15px; height: 15px; border-radius: 3px; border: 1px solid var(--border-color); }
+        
         button {
-            background-color: #e53e3e;
-            color: white;
-            border: none;
-            padding: 8px 15px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: background 0.2s;
+            background-color: #4a5568; color: white; border: none; padding: 8px 15px;
+            border-radius: 5px; cursor: pointer; font-weight: bold; transition: background 0.2s;
         }
-        button:hover { background-color: #c53030; }
+        button:hover { background-color: #2d3748; }
+        .btn-danger { background-color: #e53e3e; }
+        .btn-danger:hover { background-color: #c53030; }
+        .btn-pdf { background-color: #319795; }
+        .btn-pdf:hover { background-color: #285e61; }
 
+        /* Contenedor de la Malla y SVG */
+        .scroll-wrapper {
+            width: 100%; overflow-x: auto; position: relative; padding-bottom: 20px;
+        }
         .malla-container {
-            display: flex;
-            overflow-x: auto;
-            gap: 15px;
-            padding-bottom: 20px;
+            display: inline-flex; gap: 15px; position: relative; min-height: 600px;
         }
+        #svg-lines {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; z-index: 10;
+        }
+
         .semestre {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            min-width: 200px;
-            border-radius: 8px;
-            transition: background-color 0.2s;
-            padding: 5px; 
-        }
-        .semestre.drag-over {
-            background-color: #e2e8f0;
-            border: 2px dashed #a0aec0;
+            display: flex; flex-direction: column; gap: 10px; min-width: 200px;
+            border-radius: 8px; padding: 5px; position: relative; z-index: 15;
         }
         .semestre-titulo {
-            text-align: center;
-            font-weight: bold;
-            background-color: #2b6cb0;
-            color: white;
-            padding: 10px;
-            border-radius: 5px;
+            text-align: center; font-weight: bold; background-color: var(--semestre-titulo-bg);
+            color: white; padding: 10px; border-radius: 5px;
         }
         .semestre-promedio {
-            text-align: center;
-            font-size: 0.85em;
-            background-color: #e2e8f0;
-            color: #4a5568;
-            padding: 8px;
-            border-radius: 5px;
-            margin-top: auto;
-            font-weight: bold;
+            text-align: center; font-size: 0.85em; background-color: var(--semestre-promedio-bg);
+            color: var(--semestre-promedio-text); padding: 8px; border-radius: 5px; margin-top: auto; font-weight: bold;
         }
+
+        /* Ramos */
         .ramo {
-            border: 2px solid #cbd5e0;
-            border-radius: 8px;
-            padding: 15px 10px 22px 10px;
-            text-align: center;
-            font-size: 0.85em;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            min-height: 90px;
-            user-select: none;
-            position: relative;
+            border: 2px solid var(--border-color); border-radius: 8px; padding: 15px 10px 22px 10px;
+            text-align: center; font-size: 0.85em; cursor: pointer; transition: all 0.2s ease;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            min-height: 90px; user-select: none; position: relative; background-color: var(--box-bg);
         }
-        /* Estilos para arrastrar */
-        .ramo.movible {
-            cursor: grab;
+        .ramo.movible { cursor: grab; }
+        .ramo.movible:active { cursor: grabbing; }
+        
+        .estrella-etiqueta {
+            position: absolute; top: 5px; left: 8px; font-size: 1.2em;
+            color: #cbd5e0; cursor: pointer; transition: color 0.2s;
         }
-        .ramo.movible:active {
-            cursor: grabbing;
-        }
-        .ramo.dragging {
-            opacity: 0.4;
-            transform: scale(0.95);
-        }
+        .estrella-etiqueta.activa { color: #ecc94b; text-shadow: 0 0 5px rgba(236,201,75,0.5); }
+        .estrella-etiqueta:hover { transform: scale(1.2); }
 
-        .ramo .clave {
-            font-weight: bold;
-            margin-bottom: 5px;
-            font-size: 0.9em;
-        }
-        .creditos {
-            position: absolute;
-            bottom: 5px;
-            right: 8px;
-            font-size: 0.75em;
-            font-weight: bold;
-            opacity: 0.7;
-        }
+        .ramo .clave { font-weight: bold; margin-bottom: 5px; font-size: 0.9em; }
+        .creditos { position: absolute; bottom: 5px; right: 8px; font-size: 0.75em; font-weight: bold; opacity: 0.7; }
+        
         .select-optativa {
-            max-width: 95%;
-            margin-top: 5px;
-            font-size: 0.9em;
-            padding: 4px;
-            border-radius: 4px;
-            border: 1px solid #cbd5e0;
-            background-color: rgba(255, 255, 255, 0.8);
-            cursor: pointer;
+            max-width: 95%; margin-top: 5px; font-size: 0.9em; padding: 4px;
+            border-radius: 4px; border: 1px solid var(--border-color);
+            background-color: var(--box-bg); color: var(--text-color); cursor: pointer;
         }
+        
         .input-nota {
-            display: none;
-            width: 50px;
-            text-align: center;
-            margin-top: 8px;
-            padding: 2px;
-            border: 1px solid #a0aec0;
-            border-radius: 4px;
-            font-size: 0.95em;
-            font-weight: bold;
+            display: none; width: 50px; text-align: center; margin-top: 8px;
+            padding: 2px; border: 1px solid var(--border-color); border-radius: 4px;
+            font-size: 0.95em; font-weight: bold; background-color: var(--box-bg); color: var(--text-color);
         }
-        .ramo.aprobado .input-nota {
-            display: inline-block;
+        .ramo.aprobado .input-nota { display: inline-block; }
+
+        /* Estados dinámicos usando las variables CSS */
+        .ramo.bloqueado { background-color: var(--bloq-bg); border-color: var(--bloq-border); color: var(--bloq-text); }
+        .ramo.bloqueado .clave { color: var(--bloq-text); }
+        
+        .ramo.disponible { background-color: var(--disp-bg); border-color: var(--disp-border); color: var(--disp-text); }
+        .ramo.disponible .clave { color: var(--disp-clave); }
+        
+        .ramo.aprobado { background-color: var(--aprob-bg); border-color: var(--aprob-border); color: var(--aprob-text); }
+        .ramo.aprobado .clave { color: var(--aprob-text); }
+        .ramo.aprobado span:not(.estrella-etiqueta) { text-decoration: line-through; }
+        .ramo.aprobado .select-optativa { text-decoration: line-through; opacity: 0.8; pointer-events: none; }
+
+        /* Hover dinámico */
+        .ramo.selected { border-width: 3px; transform: scale(1.02); z-index: 20; box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
+        .ramo.prerrequisito-hover { background-color: var(--req-bg) !important; border-color: var(--req-border) !important; color: var(--req-text) !important; }
+        .ramo.abre-hover { background-color: var(--abre-bg) !important; border-color: var(--abre-border) !important; color: var(--abre-text) !important; }
+        
+        /* Búsqueda opacidad */
+        .ramo.dimmed { opacity: 0.15 !important; }
+
+        /* Área de reporte PDF oculta por defecto */
+        #print-report { display: none; }
+
+        /* --- ESTILOS DE IMPRESIÓN (PDF) --- */
+        @media print {
+            .no-print { display: none !important; }
+            body { background-color: white; color: black; padding: 0; margin: 0; }
+            #print-report { display: block; font-family: Arial, sans-serif; }
+            h2 { color: #1a365d; border-bottom: 2px solid #2b6cb0; padding-bottom: 5px; }
+            .print-table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 0.9em; }
+            .print-table th, .print-table td { border: 1px solid #cbd5e0; padding: 8px; text-align: left; }
+            .print-table th { background-color: #e2e8f0; }
         }
-
-        /* --- ESTADOS --- */
-        .ramo.bloqueado { background-color: #f1f3f5; border-color: #dee2e6; color: #868e96; }
-        .ramo.bloqueado .clave { color: #868e96; }
-        
-        .ramo.disponible { background-color: #fff9db; border-color: #fcc419; color: #333; }
-        .ramo.disponible .clave { color: #b08d00; }
-        
-        .ramo.aprobado { background-color: #d3f9d8; border-color: #40c057; color: #2b8a3e; text-decoration: line-through; }
-        .ramo.aprobado .clave { color: #2b8a3e; }
-        .ramo.aprobado span { text-decoration: none; }
-        .ramo.aprobado .select-optativa { text-decoration: none; opacity: 0.8; pointer-events: none; }
-
-        /* --- HOVER --- */
-        .ramo:hover:not(.dragging) { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.15); }
-        .ramo.selected { border-width: 3px; transform: scale(1.02); }
-        .ramo.prerrequisito-hover { background-color: #ffe3e3 !important; border-color: #fa5252 !important; color: #c92a2a !important; text-decoration: none !important; }
-        .ramo.abre-hover { background-color: #e7f5ff !important; border-color: #339af0 !important; color: #1864ab !important; text-decoration: none !important; }
     </style>
 </head>
 <body>
 
-    <div class="header-section">
-        <img src="logo.jpg" alt="Logo CEIT PUCV" class="logo-ceit">
+    <div class="no-print">
+        <div class="header-section">
+            <img src="logo.jpg" alt="Logo CEIT PUCV" class="logo-ceit">
+            <h1>Malla Interactiva - Ingeniería Civil en Transporte</h1>
+            <div class="progreso-container">
+                Créditos Aprobados: <span id="contador-creditos">0</span> de 217 (<span id="porcentaje-carrera">0.00</span>%) &nbsp;|&nbsp; 
+                PPA General: <span id="ppa-general">-</span>
+            </div>
+        </div>
         
-        <h1>Malla Interactiva - Ingeniería Civil en Transporte</h1>
-        <div class="progreso-container">
-            Créditos Aprobados: <span id="contador-creditos">0</span> de 217 (<span id="porcentaje-carrera">0.00</span>%) &nbsp;|&nbsp; 
-            PPA General: <span id="ppa-general">-</span>
+        <div class="controles-superiores">
+            <input type="text" class="buscador" id="buscador" placeholder="Buscar asignatura (ej. Física)..." onkeyup="buscarRamo()">
+            <button onclick="toggleDarkMode()" id="btn-theme">🌙 Modo Oscuro</button>
+            <button class="btn-pdf" onclick="exportarPDF()">📄 Exportar a PDF</button>
+            <button class="btn-danger" onclick="resetearMalla()">🔄 Reiniciar</button>
         </div>
-    </div>
-    
-    <div class="controles">
+
         <div class="leyenda">
-            <div class="item-leyenda"><div class="caja-color" style="background: #d3f9d8; border-color: #40c057;"></div> Aprobado</div>
-            <div class="item-leyenda"><div class="caja-color" style="background: #fff9db; border-color: #fcc419;"></div> Disponible</div>
-            <div class="item-leyenda"><div class="caja-color" style="background: #f1f3f5; border-color: #dee2e6;"></div> Bloqueado</div>
+            <div class="item-leyenda"><div class="caja-color" style="background: var(--aprob-bg); border-color: var(--aprob-border);"></div> Aprobado</div>
+            <div class="item-leyenda"><div class="caja-color" style="background: var(--disp-bg); border-color: var(--disp-border);"></div> Disponible</div>
+            <div class="item-leyenda"><div class="caja-color" style="background: var(--bloq-bg); border-color: var(--bloq-border);"></div> Bloqueado</div>
+            <div class="item-leyenda"><span>⭐ Etiquetado (Ayudantía/Destacado)</span></div>
         </div>
-        <button onclick="resetearMalla()">Reiniciar Malla</button>
+
+        <div class="scroll-wrapper">
+            <div class="malla-container" id="malla">
+                <svg id="svg-lines">
+                    <defs>
+                        <marker id="arrow-red" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                            <path d="M 0 0 L 10 5 L 0 10 z" fill="#fa5252" />
+                        </marker>
+                        <marker id="arrow-blue" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                            <path d="M 0 0 L 10 5 L 0 10 z" fill="#339af0" />
+                        </marker>
+                    </defs>
+                </svg>
+                </div>
+        </div>
     </div>
 
-    <div class="malla-container" id="malla">
-    </div>
+    <div id="print-report"></div>
 
     <script>
         const listaOptativas = [
@@ -324,7 +312,6 @@
             { id: "ELEC1", nombre: "Optativa 1", semestre: 11, semestreOriginal: 11, isOptativa: true, req: ["120CR"], movible: true },
             { id: "ELEC2", nombre: "Optativa 2", semestre: 11, semestreOriginal: 11, isOptativa: true, req: ["120CR"], movible: true },
             { id: "ELEC3", nombre: "Optativa 3", semestre: 11, semestreOriginal: 11, isOptativa: true, req: ["120CR"], movible: true },
-            
             { id: "ELEC4", nombre: "Optativa 4", semestre: 11, semestreOriginal: 11, isOptativa: true, req: ["120CR"], movible: true },
             { id: "ELEC5", nombre: "Optativa 5", semestre: 11, semestreOriginal: 11, isOptativa: true, req: ["120CR"], movible: true }
         ];
@@ -333,46 +320,48 @@
         let eleccionesOptativas = JSON.parse(localStorage.getItem('malla-transporte-optativas')) || {};
         let notas = JSON.parse(localStorage.getItem('malla-transporte-notas')) || {};
         let semestresModificados = JSON.parse(localStorage.getItem('malla-transporte-semestres')) || {};
+        let etiquetas = JSON.parse(localStorage.getItem('malla-transporte-etiquetas')) || {};
+        let isDark = JSON.parse(localStorage.getItem('malla-transporte-darkmode')) || false;
+        
         let totalCreditos = 0;
         const numSemestres = 11;
 
+        // Inicializar tema
+        if(isDark) { document.body.classList.add('dark-mode'); document.getElementById('btn-theme').innerText = "☀️ Modo Claro"; }
+
+        function toggleDarkMode() {
+            isDark = !isDark;
+            document.body.classList.toggle('dark-mode', isDark);
+            document.getElementById('btn-theme').innerText = isDark ? "☀️ Modo Claro" : "🌙 Modo Oscuro";
+            localStorage.setItem('malla-transporte-darkmode', JSON.stringify(isDark));
+        }
+
         function generarMalla() {
             ramos.forEach(r => {
-                if (r.movible) {
-                    r.semestre = semestresModificados[r.id] || r.semestreOriginal;
-                }
+                if (r.movible) r.semestre = semestresModificados[r.id] || r.semestreOriginal;
             });
 
             const container = document.getElementById('malla');
-            container.innerHTML = ''; 
+            // Mantener solo el SVG inicial
+            Array.from(container.children).forEach(child => {
+                if(child.id !== 'svg-lines') container.removeChild(child);
+            });
 
             for (let i = 1; i <= numSemestres; i++) {
                 const col = document.createElement('div');
-                col.className = 'semestre';
-                col.id = `semestre-${i}`;
+                col.className = 'semestre'; col.id = `semestre-${i}`;
                 
                 const titulo = document.createElement('div');
-                titulo.className = 'semestre-titulo';
-                titulo.innerText = `Semestre ${i}`;
+                titulo.className = 'semestre-titulo'; titulo.innerText = `Semestre ${i}`;
                 col.appendChild(titulo);
                 
-                col.addEventListener('dragover', (e) => {
-                    e.preventDefault();
-                    col.classList.add('drag-over');
-                });
-                col.addEventListener('dragleave', () => {
-                    col.classList.remove('drag-over');
-                });
+                col.addEventListener('dragover', (e) => { e.preventDefault(); col.classList.add('drag-over'); });
+                col.addEventListener('dragleave', () => col.classList.remove('drag-over') );
                 col.addEventListener('drop', (e) => {
-                    e.preventDefault();
-                    col.classList.remove('drag-over');
+                    e.preventDefault(); col.classList.remove('drag-over');
                     const ramoId = e.dataTransfer.getData('text/plain');
-                    if (ramoId) {
-                        const nuevoSemestre = i;
-                        moverRamoDrop(ramoId, nuevoSemestre);
-                    }
+                    if (ramoId) moverRamoDrop(ramoId, i);
                 });
-
                 container.appendChild(col);
                 
                 const footer = document.createElement('div');
@@ -395,12 +384,12 @@
                         e.dataTransfer.setData('text/plain', ramo.id);
                         setTimeout(() => div.classList.add('dragging'), 0);
                     });
-                    div.addEventListener('dragend', () => {
-                        div.classList.remove('dragging');
-                    });
+                    div.addEventListener('dragend', () => div.classList.remove('dragging'));
                 }
 
                 const notaInput = `<input type="number" class="input-nota" id="nota-${ramo.id}" step="0.1" min="1.0" max="7.0" placeholder="4.0" onchange="actualizarNota(event, '${ramo.id}')" onclick="event.stopPropagation()">`;
+                const classEstrella = etiquetas[ramo.id] ? "estrella-etiqueta activa" : "estrella-etiqueta";
+                const estrellaHTML = `<span class="${classEstrella}" onclick="toggleEtiqueta(event, '${ramo.id}')" title="Marcar Ayudantía/Destacado">★</span>`;
 
                 if (ramo.isOptativa) {
                     let opcionesHTML = `<option value="">Elegir asignatura...</option>`;
@@ -410,6 +399,7 @@
                     });
 
                     div.innerHTML = `
+                        ${estrellaHTML}
                         <span class="clave">${ramo.id}</span>
                         <select class="select-optativa" onchange="seleccionarOptativa(event, '${ramo.id}')" onclick="event.stopPropagation()">
                             ${opcionesHTML}
@@ -419,21 +409,27 @@
                     `;
                 } else {
                     div.innerHTML = `
+                        ${estrellaHTML}
                         <span class="clave">${ramo.id}</span>
                         <span>${ramo.nombre}</span>
                         ${notaInput}
                         <span class="creditos">${ramo.cr} CR</span>
                     `;
                 }
-                
                 col.insertBefore(div, col.lastChild);
                 
                 div.addEventListener('click', () => toggleRamo(ramo.id));
                 div.addEventListener('mouseenter', () => hacerHover(ramo.id));
                 div.addEventListener('mouseleave', limpiarHover);
             });
-
             actualizarEstados();
+        }
+
+        function toggleEtiqueta(event, id) {
+            event.stopPropagation();
+            etiquetas[id] = !etiquetas[id];
+            localStorage.setItem('malla-transporte-etiquetas', JSON.stringify(etiquetas));
+            generarMalla(); // Refresca estrella
         }
 
         function moverRamoDrop(id, nuevoSemestre) {
@@ -447,21 +443,16 @@
 
         function actualizarNota(event, id) {
             let val = parseFloat(event.target.value);
-            if (!isNaN(val) && val >= 1.0 && val <= 7.0) {
-                notas[id] = val;
-            } else {
-                notas[id] = 4.0;
-                event.target.value = 4.0;
-            }
+            if (!isNaN(val) && val >= 1.0 && val <= 7.0) notas[id] = val;
+            else { notas[id] = 4.0; event.target.value = 4.0; }
             localStorage.setItem('malla-transporte-notas', JSON.stringify(notas));
             actualizarEstados();
         }
 
         function seleccionarOptativa(event, slotId) {
             const val = event.target.value;
-            if(val) {
-                eleccionesOptativas[slotId] = val;
-            } else {
+            if(val) eleccionesOptativas[slotId] = val;
+            else {
                 delete eleccionesOptativas[slotId];
                 if (aprobados.includes(slotId)) toggleRamo(slotId); 
             }
@@ -470,9 +461,7 @@
         }
 
         function actualizarEstados() {
-            let credOpt = 0;
-            let countOpt = 0;
-            
+            let credOpt = 0; let countOpt = 0;
             ['ELEC1', 'ELEC2', 'ELEC3'].forEach(id => {
                 if (eleccionesOptativas[id]) {
                     let opt = listaOptativas.find(x => x.id === eleccionesOptativas[id]);
@@ -481,7 +470,6 @@
             });
 
             let mostrarElec4 = (countOpt >= 3 && credOpt < 12);
-            
             if (mostrarElec4 && eleccionesOptativas['ELEC4']) {
                 let opt4 = listaOptativas.find(x => x.id === eleccionesOptativas['ELEC4']);
                 if (opt4) credOpt += opt4.cr;
@@ -491,16 +479,10 @@
 
             let needUpdateStorage = false;
             if (!mostrarElec4 && (eleccionesOptativas['ELEC4'] || aprobados.includes('ELEC4'))) {
-                delete eleccionesOptativas['ELEC4'];
-                aprobados = aprobados.filter(id => id !== 'ELEC4');
-                delete notas['ELEC4'];
-                needUpdateStorage = true;
+                delete eleccionesOptativas['ELEC4']; aprobados = aprobados.filter(id => id !== 'ELEC4'); delete notas['ELEC4']; needUpdateStorage = true;
             }
             if (!mostrarElec5 && (eleccionesOptativas['ELEC5'] || aprobados.includes('ELEC5'))) {
-                delete eleccionesOptativas['ELEC5'];
-                aprobados = aprobados.filter(id => id !== 'ELEC5');
-                delete notas['ELEC5'];
-                needUpdateStorage = true;
+                delete eleccionesOptativas['ELEC5']; aprobados = aprobados.filter(id => id !== 'ELEC5'); delete notas['ELEC5']; needUpdateStorage = true;
             }
             
             if (needUpdateStorage) {
@@ -509,9 +491,7 @@
                 localStorage.setItem('malla-transporte-notas', JSON.stringify(notas));
             }
 
-            let sumaNotasPorCredito = 0;
-            let sumaCreditosGeneral = 0;
-            totalCreditos = 0;
+            let sumaNotasPorCredito = 0; let sumaCreditosGeneral = 0; totalCreditos = 0;
 
             aprobados.forEach(id => {
                 let r = ramos.find(x => x.id === id);
@@ -519,20 +499,15 @@
                     if (r.isOptativa && eleccionesOptativas[id]) {
                         let opt = listaOptativas.find(x => x.id === eleccionesOptativas[id]);
                         if (opt) totalCreditos += opt.cr;
-                    } else if (!r.isOptativa) {
-                        totalCreditos += r.cr;
-                    }
+                    } else if (!r.isOptativa) totalCreditos += r.cr;
                 }
             });
             
-            // Actualizar textos de créditos y porcentaje
             document.getElementById('contador-creditos').innerText = totalCreditos;
-            let porcentaje = ((totalCreditos / 217) * 100).toFixed(2);
-            document.getElementById('porcentaje-carrera').innerText = porcentaje;
+            document.getElementById('porcentaje-carrera').innerText = ((totalCreditos / 217) * 100).toFixed(2);
 
             for (let i = 1; i <= numSemestres; i++) {
-                let sumaSemestre = 0;
-                let creditosSemestre = 0;
+                let sumaSemestre = 0; let creditosSemestre = 0;
 
                 ramos.filter(r => r.semestre === i).forEach(ramo => {
                     const el = document.getElementById(ramo.id);
@@ -548,14 +523,11 @@
                         if (eleccionesOptativas[ramo.id]) {
                             let opt = listaOptativas.find(x => x.id === eleccionesOptativas[ramo.id]);
                             if (opt) crSpan.innerText = `${opt.cr} CR`;
-                        } else {
-                            crSpan.innerText = `- CR`;
-                        }
+                        } else crSpan.innerText = `- CR`;
                     }
 
                     if (aprobados.includes(ramo.id)) {
                         el.classList.add('aprobado');
-                        
                         let inputEl = document.getElementById(`nota-${ramo.id}`);
                         if (inputEl) {
                             let notaActual = notas[ramo.id] || 4.0;
@@ -566,100 +538,159 @@
                                 let opt = listaOptativas.find(x => x.id === eleccionesOptativas[ramo.id]);
                                 if (opt) crRamo = opt.cr;
                             }
-                            sumaSemestre += (notaActual * crRamo);
-                            creditosSemestre += crRamo;
+                            sumaSemestre += (notaActual * crRamo); creditosSemestre += crRamo;
                         }
                     } else {
                         const cumpleRequisitos = ramo.req.every(req => {
                             if (req === "120CR") return totalCreditos >= 120;
                             return aprobados.includes(req);
                         });
-                        
-                        if (cumpleRequisitos) {
-                            el.classList.add('disponible');
-                        } else {
-                            el.classList.add('bloqueado');
-                        }
+                        if (cumpleRequisitos) el.classList.add('disponible');
+                        else el.classList.add('bloqueado');
                     }
                 });
 
-                let promSemestre = creditosSemestre > 0 ? (sumaSemestre / creditosSemestre).toFixed(1) : "-";
-                document.getElementById(`promedio-sem-${i}`).innerText = promSemestre;
-                
-                sumaNotasPorCredito += sumaSemestre;
-                sumaCreditosGeneral += creditosSemestre;
+                document.getElementById(`promedio-sem-${i}`).innerText = creditosSemestre > 0 ? (sumaSemestre / creditosSemestre).toFixed(1) : "-";
+                sumaNotasPorCredito += sumaSemestre; sumaCreditosGeneral += creditosSemestre;
             }
 
-            let ppa = sumaCreditosGeneral > 0 ? (sumaNotasPorCredito / sumaCreditosGeneral).toFixed(1) : "-";
-            document.getElementById('ppa-general').innerText = ppa;
+            document.getElementById('ppa-general').innerText = sumaCreditosGeneral > 0 ? (sumaNotasPorCredito / sumaCreditosGeneral).toFixed(1) : "-";
         }
 
         function toggleRamo(id) {
             const ramo = ramos.find(r => r.id === id);
-            
-            if (ramo.isOptativa && !eleccionesOptativas[id]) {
-                alert("Primero debes elegir una asignatura del menú desplegable.");
-                return;
-            }
+            if (ramo.isOptativa && !eleccionesOptativas[id]) { alert("Primero debes elegir una asignatura del menú."); return; }
 
             if (aprobados.includes(id)) {
-                aprobados = aprobados.filter(ramoId => ramoId !== id);
-                delete notas[id]; 
+                aprobados = aprobados.filter(ramoId => ramoId !== id); delete notas[id]; 
             } else {
                 if (document.getElementById(id).classList.contains('bloqueado')) return;
-                aprobados.push(id);
-                notas[id] = 4.0; 
+                aprobados.push(id); notas[id] = 4.0; 
             }
-            
             localStorage.setItem('malla-transporte-aprobados', JSON.stringify(aprobados));
             localStorage.setItem('malla-transporte-notas', JSON.stringify(notas));
             actualizarEstados();
         }
 
+        function buscarRamo() {
+            let texto = document.getElementById('buscador').value.toLowerCase();
+            document.querySelectorAll('.ramo').forEach(el => {
+                let id = el.id.toLowerCase();
+                let nombre = el.innerText.toLowerCase();
+                if (texto === "" || id.includes(texto) || nombre.includes(texto)) {
+                    el.classList.remove('dimmed');
+                } else {
+                    el.classList.add('dimmed');
+                }
+            });
+        }
+
+        // --- SISTEMA DE DIBUJO DE LÍNEAS SVG ---
         function hacerHover(idSeleccionado) {
             limpiarHover();
             const ramoActual = ramos.find(r => r.id === idSeleccionado);
             if (!ramoActual) return;
+            const origenEl = document.getElementById(idSeleccionado);
+            origenEl.classList.add('selected');
 
-            document.getElementById(idSeleccionado).classList.add('selected');
+            // Preparar contenedor SVG
+            const svg = document.getElementById('svg-lines');
+            // Mantener solo los marcadores (defs)
+            Array.from(svg.children).forEach(child => { if(child.tagName !== 'defs') svg.removeChild(child); });
 
             ramoActual.req.forEach(reqId => {
                 if (reqId !== "120CR") {
                     const el = document.getElementById(reqId);
-                    if (el) el.classList.add('prerrequisito-hover');
+                    if (el) {
+                        el.classList.add('prerrequisito-hover');
+                        dibujarLinea(el, origenEl, '#fa5252'); // Línea roja desde requisito a origen
+                    }
                 }
             });
 
             ramos.forEach(r => {
                 if (r.req.includes(idSeleccionado)) {
                     const el = document.getElementById(r.id);
-                    if (el) el.classList.add('abre-hover');
+                    if (el) {
+                        el.classList.add('abre-hover');
+                        dibujarLinea(origenEl, el, '#339af0'); // Línea azul desde origen hacia los que abre
+                    }
                 }
             });
         }
 
+        function dibujarLinea(el1, el2, color) {
+            const svg = document.getElementById('svg-lines');
+            // Coordenadas relativas al contenedor scrollable .malla-container
+            const x1 = el1.offsetLeft + el1.offsetWidth;
+            const y1 = el1.offsetTop + el1.offsetHeight / 2;
+            const x2 = el2.offsetLeft;
+            const y2 = el2.offsetTop + el2.offsetHeight / 2;
+
+            const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+            // Curva de Bezier para hacer la línea suave
+            path.setAttribute('d', `M ${x1} ${y1} C ${x1 + 30} ${y1}, ${x2 - 30} ${y2}, ${x2} ${y2}`);
+            path.setAttribute('stroke', color);
+            path.setAttribute('stroke-width', '2.5');
+            path.setAttribute('fill', 'none');
+            // Referenciar el id del marcador de flecha creado en <defs>
+            let arrowId = color === '#fa5252' ? 'url(#arrow-red)' : 'url(#arrow-blue)';
+            path.setAttribute('marker-end', arrowId);
+            svg.appendChild(path);
+        }
+
         function limpiarHover() {
-            document.querySelectorAll('.ramo').forEach(el => {
-                el.classList.remove('selected', 'prerrequisito-hover', 'abre-hover');
+            document.querySelectorAll('.ramo').forEach(el => el.classList.remove('selected', 'prerrequisito-hover', 'abre-hover'));
+            const svg = document.getElementById('svg-lines');
+            Array.from(svg.children).forEach(child => { if(child.tagName !== 'defs') svg.removeChild(child); });
+        }
+
+        // --- EXPORTAR A PDF ---
+        function exportarPDF() {
+            let html = `<h2>Reporte de Avance Académico - Ing. Civil en Transporte</h2>`;
+            html += `<p><strong>Créditos Aprobados:</strong> ${totalCreditos} de 217 (${((totalCreditos / 217) * 100).toFixed(2)}%)</p>`;
+            html += `<p><strong>PPA General Estimado:</strong> ${document.getElementById('ppa-general').innerText}</p>`;
+            
+            // Ramos etiquetados / Ayudantías
+            let etiquetados = Object.keys(etiquetas).filter(k => etiquetas[k]);
+            if(etiquetados.length > 0) {
+                 html += `<h3>📌 Ramos Destacados / Ayudantías</h3><table class="print-table"><tr><th>Clave</th><th>Nombre</th></tr>`;
+                 etiquetados.forEach(id => {
+                     let r = ramos.find(x => x.id === id);
+                     if(r) {
+                         let nombre = r.isOptativa && eleccionesOptativas[id] ? listaOptativas.find(x => x.id === eleccionesOptativas[id]).nombre : r.nombre;
+                         html += `<tr><td>${r.id}</td><td>${nombre}</td></tr>`;
+                     }
+                 });
+                 html += `</table>`;
+            }
+
+            // Ramos Aprobados
+            html += `<h3>✅ Ramos Aprobados</h3><table class="print-table"><tr><th>Clave</th><th>Nombre</th><th>Semestre Org.</th><th>Nota</th></tr>`;
+            let aprobadosData = aprobados.map(id => ramos.find(r => r.id === id)).filter(Boolean);
+            aprobadosData.sort((a, b) => a.semestreOriginal - b.semestreOriginal);
+            
+            aprobadosData.forEach(r => {
+                let nota = notas[r.id] || 4.0;
+                let nombre = r.isOptativa && eleccionesOptativas[r.id] ? listaOptativas.find(x => x.id === eleccionesOptativas[r.id]).nombre : r.nombre;
+                html += `<tr><td>${r.id}</td><td>${nombre}</td><td>Sem ${r.semestreOriginal}</td><td>${nota.toFixed(1)}</td></tr>`;
             });
+            html += `</table>`;
+
+            document.getElementById('print-report').innerHTML = html;
+            window.print();
         }
 
         function resetearMalla() {
-            if(confirm("¿Estás seguro de que quieres reiniciar tu malla? Esto borrará tus ramos, notas y posiciones.")){
-                aprobados = [];
-                eleccionesOptativas = {};
-                notas = {};
-                semestresModificados = {};
-                localStorage.removeItem('malla-transporte-aprobados');
-                localStorage.removeItem('malla-transporte-optativas');
-                localStorage.removeItem('malla-transporte-notas');
-                localStorage.removeItem('malla-transporte-semestres');
+            if(confirm("¿Estás seguro de que quieres reiniciar tu malla? Esto borrará tus ramos, notas, etiquetas y posiciones.")){
+                aprobados = []; eleccionesOptativas = {}; notas = {}; semestresModificados = {}; etiquetas = {};
+                localStorage.clear();
+                localStorage.setItem('malla-transporte-darkmode', JSON.stringify(isDark)); // Mantener modo actual
                 generarMalla(); 
             }
         }
 
         generarMalla();
-
     </script>
 </body>
 </html>
