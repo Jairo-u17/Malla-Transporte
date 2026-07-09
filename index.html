@@ -103,7 +103,7 @@
             min-width: 200px;
             border-radius: 8px;
             transition: background-color 0.2s;
-            padding: 5px; /* Para que al arrastrar sobre él se vea un margen interno */
+            padding: 5px; 
         }
         .semestre.drag-over {
             background-color: #e2e8f0;
@@ -235,7 +235,7 @@
     </div>
 
     <div class="malla-container" id="malla">
-        </div>
+    </div>
 
     <script>
         const listaOptativas = [
@@ -323,7 +323,11 @@
             { id: "ICN610", nombre: "Proyecto de Título en Transporte", semestre: 11, cr: 8, req: ["ICN528"] },
             { id: "ELEC1", nombre: "Optativa 1", semestre: 11, semestreOriginal: 11, isOptativa: true, req: ["120CR"], movible: true },
             { id: "ELEC2", nombre: "Optativa 2", semestre: 11, semestreOriginal: 11, isOptativa: true, req: ["120CR"], movible: true },
-            { id: "ELEC3", nombre: "Optativa 3", semestre: 11, semestreOriginal: 11, isOptativa: true, req: ["120CR"], movible: true }
+            { id: "ELEC3", nombre: "Optativa 3", semestre: 11, semestreOriginal: 11, isOptativa: true, req: ["120CR"], movible: true },
+            
+            // Optativos Dinámicos agregados a la matriz general
+            { id: "ELEC4", nombre: "Optativa 4", semestre: 11, semestreOriginal: 11, isOptativa: true, req: ["120CR"], movible: true },
+            { id: "ELEC5", nombre: "Optativa 5", semestre: 11, semestreOriginal: 11, isOptativa: true, req: ["120CR"], movible: true }
         ];
 
         let aprobados = JSON.parse(localStorage.getItem('malla-transporte-aprobados')) || [];
@@ -356,7 +360,7 @@
                 
                 // --- Eventos Drag and Drop para la Columna ---
                 col.addEventListener('dragover', (e) => {
-                    e.preventDefault(); // Permite soltar elementos aquí
+                    e.preventDefault();
                     col.classList.add('drag-over');
                 });
                 col.addEventListener('dragleave', () => {
@@ -439,11 +443,10 @@
         // Función que se dispara al soltar el ramo en una nueva columna
         function moverRamoDrop(id, nuevoSemestre) {
             const ramo = ramos.find(r => r.id === id);
-            // Validar que el ramo soltado realmente sea movible
             if (ramo && ramo.movible) {
                 semestresModificados[id] = nuevoSemestre;
                 localStorage.setItem('malla-transporte-semestres', JSON.stringify(semestresModificados));
-                generarMalla(); // Refrescar la vista
+                generarMalla(); 
             }
         }
 
@@ -472,6 +475,51 @@
         }
 
         function actualizarEstados() {
+            // --- LÓGICA DE OPTATIVOS DINÁMICOS ---
+            let credOpt = 0;
+            let countOpt = 0;
+            
+            // 1. Sumar créditos de las primeras 3 (ELEC1, ELEC2, ELEC3)
+            ['ELEC1', 'ELEC2', 'ELEC3'].forEach(id => {
+                if (eleccionesOptativas[id]) {
+                    let opt = listaOptativas.find(x => x.id === eleccionesOptativas[id]);
+                    if (opt) { credOpt += opt.cr; countOpt++; }
+                }
+            });
+
+            // 2. Determinar si se muestra ELEC4
+            let mostrarElec4 = (countOpt >= 3 && credOpt < 12);
+            
+            if (mostrarElec4 && eleccionesOptativas['ELEC4']) {
+                let opt4 = listaOptativas.find(x => x.id === eleccionesOptativas['ELEC4']);
+                if (opt4) credOpt += opt4.cr;
+            }
+
+            // 3. Determinar si se muestra ELEC5 (por si aún no se llega a 12 con ELEC4)
+            let mostrarElec5 = (mostrarElec4 && eleccionesOptativas['ELEC4'] && credOpt < 12);
+
+            // 4. Limpieza segura: Si se ocultan los campos extra, se limpian sus variables guardadas
+            let needUpdateStorage = false;
+            if (!mostrarElec4 && (eleccionesOptativas['ELEC4'] || aprobados.includes('ELEC4'))) {
+                delete eleccionesOptativas['ELEC4'];
+                aprobados = aprobados.filter(id => id !== 'ELEC4');
+                delete notas['ELEC4'];
+                needUpdateStorage = true;
+            }
+            if (!mostrarElec5 && (eleccionesOptativas['ELEC5'] || aprobados.includes('ELEC5'))) {
+                delete eleccionesOptativas['ELEC5'];
+                aprobados = aprobados.filter(id => id !== 'ELEC5');
+                delete notas['ELEC5'];
+                needUpdateStorage = true;
+            }
+            
+            if (needUpdateStorage) {
+                localStorage.setItem('malla-transporte-optativas', JSON.stringify(eleccionesOptativas));
+                localStorage.setItem('malla-transporte-aprobados', JSON.stringify(aprobados));
+                localStorage.setItem('malla-transporte-notas', JSON.stringify(notas));
+            }
+            // ------------------------------------
+
             let sumaNotasPorCredito = 0;
             let sumaCreditosGeneral = 0;
             totalCreditos = 0;
@@ -497,6 +545,10 @@
                     const el = document.getElementById(ramo.id);
                     if(!el) return;
                     
+                    // Control de visibilidad para Optativos extra
+                    if (ramo.id === 'ELEC4') el.style.display = mostrarElec4 ? 'flex' : 'none';
+                    if (ramo.id === 'ELEC5') el.style.display = mostrarElec5 ? 'flex' : 'none';
+
                     el.classList.remove('aprobado', 'disponible', 'bloqueado');
 
                     if (ramo.isOptativa) {
