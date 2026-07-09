@@ -621,21 +621,31 @@
 
         function dibujarLinea(el1, el2, color) {
             const svg = document.getElementById('svg-lines');
-            // Coordenadas relativas al contenedor scrollable .malla-container
-            const x1 = el1.offsetLeft + el1.offsetWidth;
-            const y1 = el1.offsetTop + el1.offsetHeight / 2;
-            const x2 = el2.offsetLeft;
-            const y2 = el2.offsetTop + el2.offsetHeight / 2;
+            
+            // Obtenemos las coordenadas reales en la pantalla del origen, destino y el lienzo SVG
+            const rect1 = el1.getBoundingClientRect();
+            const rect2 = el2.getBoundingClientRect();
+            const svgRect = svg.getBoundingClientRect();
+
+            // Calculamos la posición X e Y relativas al lienzo SVG
+            const x1 = rect1.right - svgRect.left; // Centro-derecha del ramo de origen
+            const y1 = rect1.top + (rect1.height / 2) - svgRect.top;
+            
+            const x2 = rect2.left - svgRect.left; // Centro-izquierda del ramo destino
+            const y2 = rect2.top + (rect2.height / 2) - svgRect.top;
 
             const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-            // Curva de Bezier para hacer la línea suave
+            
+            // Dibujamos la curva suavizada
             path.setAttribute('d', `M ${x1} ${y1} C ${x1 + 30} ${y1}, ${x2 - 30} ${y2}, ${x2} ${y2}`);
             path.setAttribute('stroke', color);
             path.setAttribute('stroke-width', '2.5');
             path.setAttribute('fill', 'none');
-            // Referenciar el id del marcador de flecha creado en <defs>
+            
+            // Asignamos la punta de flecha según el color
             let arrowId = color === '#fa5252' ? 'url(#arrow-red)' : 'url(#arrow-blue)';
             path.setAttribute('marker-end', arrowId);
+            
             svg.appendChild(path);
         }
 
