@@ -220,7 +220,7 @@
         
         <h1>Malla Interactiva - Ingeniería Civil en Transporte</h1>
         <div class="progreso-container">
-            Créditos Aprobados: <span id="contador-creditos">0</span> &nbsp;|&nbsp; 
+            Créditos Aprobados: <span id="contador-creditos">0</span> de 217 &nbsp;|&nbsp; 
             PPA General: <span id="ppa-general">-</span>
         </div>
     </div>
@@ -325,7 +325,6 @@
             { id: "ELEC2", nombre: "Optativa 2", semestre: 11, semestreOriginal: 11, isOptativa: true, req: ["120CR"], movible: true },
             { id: "ELEC3", nombre: "Optativa 3", semestre: 11, semestreOriginal: 11, isOptativa: true, req: ["120CR"], movible: true },
             
-            // Optativos Dinámicos agregados a la matriz general
             { id: "ELEC4", nombre: "Optativa 4", semestre: 11, semestreOriginal: 11, isOptativa: true, req: ["120CR"], movible: true },
             { id: "ELEC5", nombre: "Optativa 5", semestre: 11, semestreOriginal: 11, isOptativa: true, req: ["120CR"], movible: true }
         ];
@@ -338,7 +337,6 @@
         const numSemestres = 11;
 
         function generarMalla() {
-            // Aplicar semestres modificados antes de dibujar
             ramos.forEach(r => {
                 if (r.movible) {
                     r.semestre = semestresModificados[r.id] || r.semestreOriginal;
@@ -358,7 +356,6 @@
                 titulo.innerText = `Semestre ${i}`;
                 col.appendChild(titulo);
                 
-                // --- Eventos Drag and Drop para la Columna ---
                 col.addEventListener('dragover', (e) => {
                     e.preventDefault();
                     col.classList.add('drag-over');
@@ -392,7 +389,6 @@
                 div.className = 'ramo' + (ramo.movible ? ' movible' : '');
                 div.id = ramo.id;
                 
-                // --- Eventos Drag and Drop para el Ramo ---
                 if (ramo.movible) {
                     div.setAttribute('draggable', 'true');
                     div.addEventListener('dragstart', (e) => {
@@ -440,7 +436,6 @@
             actualizarEstados();
         }
 
-        // Función que se dispara al soltar el ramo en una nueva columna
         function moverRamoDrop(id, nuevoSemestre) {
             const ramo = ramos.find(r => r.id === id);
             if (ramo && ramo.movible) {
@@ -475,11 +470,9 @@
         }
 
         function actualizarEstados() {
-            // --- LÓGICA DE OPTATIVOS DINÁMICOS ---
             let credOpt = 0;
             let countOpt = 0;
             
-            // 1. Sumar créditos de las primeras 3 (ELEC1, ELEC2, ELEC3)
             ['ELEC1', 'ELEC2', 'ELEC3'].forEach(id => {
                 if (eleccionesOptativas[id]) {
                     let opt = listaOptativas.find(x => x.id === eleccionesOptativas[id]);
@@ -487,7 +480,6 @@
                 }
             });
 
-            // 2. Determinar si se muestra ELEC4
             let mostrarElec4 = (countOpt >= 3 && credOpt < 12);
             
             if (mostrarElec4 && eleccionesOptativas['ELEC4']) {
@@ -495,10 +487,8 @@
                 if (opt4) credOpt += opt4.cr;
             }
 
-            // 3. Determinar si se muestra ELEC5 (por si aún no se llega a 12 con ELEC4)
             let mostrarElec5 = (mostrarElec4 && eleccionesOptativas['ELEC4'] && credOpt < 12);
 
-            // 4. Limpieza segura: Si se ocultan los campos extra, se limpian sus variables guardadas
             let needUpdateStorage = false;
             if (!mostrarElec4 && (eleccionesOptativas['ELEC4'] || aprobados.includes('ELEC4'))) {
                 delete eleccionesOptativas['ELEC4'];
@@ -518,7 +508,6 @@
                 localStorage.setItem('malla-transporte-aprobados', JSON.stringify(aprobados));
                 localStorage.setItem('malla-transporte-notas', JSON.stringify(notas));
             }
-            // ------------------------------------
 
             let sumaNotasPorCredito = 0;
             let sumaCreditosGeneral = 0;
@@ -545,7 +534,6 @@
                     const el = document.getElementById(ramo.id);
                     if(!el) return;
                     
-                    // Control de visibilidad para Optativos extra
                     if (ramo.id === 'ELEC4') el.style.display = mostrarElec4 ? 'flex' : 'none';
                     if (ramo.id === 'ELEC5') el.style.display = mostrarElec5 ? 'flex' : 'none';
 
