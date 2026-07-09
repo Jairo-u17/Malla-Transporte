@@ -220,7 +220,7 @@
         
         <h1>Malla Interactiva - Ingeniería Civil en Transporte</h1>
         <div class="progreso-container">
-            Créditos Aprobados: <span id="contador-creditos">0</span> de 217 &nbsp;|&nbsp; 
+            Créditos Aprobados: <span id="contador-creditos">0</span> de 217 (<span id="porcentaje-carrera">0.00</span>%) &nbsp;|&nbsp; 
             PPA General: <span id="ppa-general">-</span>
         </div>
     </div>
@@ -524,7 +524,11 @@
                     }
                 }
             });
+            
+            // Actualizar textos de créditos y porcentaje
             document.getElementById('contador-creditos').innerText = totalCreditos;
+            let porcentaje = ((totalCreditos / 217) * 100).toFixed(2);
+            document.getElementById('porcentaje-carrera').innerText = porcentaje;
 
             for (let i = 1; i <= numSemestres; i++) {
                 let sumaSemestre = 0;
